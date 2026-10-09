@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generic stand-in launcher icon: nine map squares, the middle one lit. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#4A4A4A"
+        android:pathData="M36,36 h10 v10 h-10 Z" />
+    <path
+        android:fillColor="#4A4A4A"
+        android:pathData="M49,36 h10 v10 h-10 Z" />
+    <path
+        android:fillColor="#4A4A4A"
+        android:pathData="M62,36 h10 v10 h-10 Z" />
+    <path
+        android:fillColor="#4A4A4A"
+        android:pathData="M36,49 h10 v10 h-10 Z" />
+    <path
+        android:fillColor="#E8E8E8"
+        android:pathData="M49,49 h10 v10 h-10 Z" />
+    <path
+        android:fillColor="#4A4A4A"
+        android:pathData="M62,49 h10 v10 h-10 Z" />
+    <path
+        android:fillColor="#4A4A4A"
+        android:pathData="M36,62 h10 v10 h-10 Z" />
+    <path
+        android:fillColor="#4A4A4A"
+        android:pathData="M49,62 h10 v10 h-10 Z" />
+    <path
+        android:fillColor="#4A4A4A"
+        android:pathData="M62,62 h10 v10 h-10 Z" />
+</vector>

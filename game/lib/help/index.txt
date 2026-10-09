@@ -1,0 +1,38 @@
+Ammerow Field Guide
+===================
+
+This is the in-game reference for Ammerow: Lands Beyond on a touch screen.
+It covers the touch controls, the interface, surface travel, fishing, and
+the turn-based side-view caves.  Every button presses one of the game's own
+commands, so a hardware keyboard works too; section (g) lists its keys.
+
+Tap a section to open it:
+
+    (a) Touch controls
+    (b) Map symbols
+    (c) Interface, settings and saving
+    (d) The known world and travel
+    (e) Fishing
+    (f) Side-view caves
+    (g) Keyboard commands
+
+
+
+
+Reading a page: PgDn and PgUp (or the d-pad) move through it, a tap on
+the page advances it, Find searches it, and Back returns here or leaves
+the guide.  The Help button closes the whole guide.
+
+.. menu:: [a] touch.txt
+
+.. menu:: [b] symbols.txt
+
+.. menu:: [c] interface.txt
+
+.. menu:: [d] world.txt
+
+.. menu:: [e] fishing.txt
+
+.. menu:: [f] spelunking.txt
+
+.. menu:: [g] commands.txt

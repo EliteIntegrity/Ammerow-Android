@@ -1,0 +1,125 @@
+Interface, Settings and Saving
+==============================
+
+Saving
+------
+
+The game saves your run whenever you leave the app: switching away, the
+Home button, or the screen turning off.  If Android closes the app while
+it is away, the run is waiting under Continue when you return.  To save
+and stop, use Menu, then Save and Return Home.
+
+Settings
+--------
+
+Menu, then Settings.  The pages are:
+
+  Appearance              theme, map font, ASCII treatment, and the map
+                          presentation: ASCII, or Hybrid, which draws
+                          monsters and some items as portrait sprites
+                          over ordinary ASCII terrain, at 32 x 32 or
+                          64 x 64 detail (a glyph stands in wherever
+                          there is no sprite).  Detail does not change
+                          the map's scale; cards and shopkeepers stay
+                          coloured ASCII.
+  Interface               the menu and message font, interface density,
+                          the statistics and message overlays, and where
+                          recent messages appear (top right unless you
+                          choose Top or Bottom)
+  Sound                   the master volume and each kind of sound
+  Display / Performance   map zoom, animated combat, and whether the
+                          weather is shown (it chooses itself; its
+                          sound is under Sound)
+
+Tap a setting to choose it, and use the d-pad's left and right to change
+it.  Back returns to the list of pages.
+
+Character creation
+------------------
+
+On the origin, class and attribute-method choices, Options opens the
+birth options: tap an option, or press Toggle, to switch it.  They are
+fixed once the run starts, and options marked experimental stay so.
+
+Attribute allocation shows each attribute's base value, the origin and
+class modifiers, the final value and the points spent, with the focus,
+carrying weight, blows and gold that result.  The d-pad's left and right change
+the highlighted attribute; Reset starts again.  With the roller, Reroll
+rolls a new candidate and Previous brings back the last one; colours and
++/- marks compare the final values.  Attributes take effect at
+thresholds, so not every point changes everything.
+
+Zoom
+----
+
+Pinch the map with two fingers, or use Zoom in and Zoom out under More.
+Map zoom is separate from the size of menus and messages, so a dense menu
+does not make the map tiny.
+
+Look
+----
+
+Look (on the right-hand buttons, or under More) shows what is on a
+square; move it with the d-pad and press Back to close the card.  A
+target you chose may keep its marker after an attack, but its card
+closes when you finish aiming; Look shows it again.  Holding
+a finger on a square opens a menu that includes Look At.  In a cave, Peek
+is a different safety action, described in 'spelunking.txt'.
+
+Shops
+-----
+
+Tap an item to highlight it: Examine shows it at once, and Buy (or a tap
+on the highlighted item) opens its actions.  Sell offers your own items.
+In the General Store, Donate gives a fishing catch to the village larder.
+When nothing you carry is wanted, the reason stays above the stock until
+your next action.
+
+Poison
+------
+
+While you are poisoned the statistics panel says so beside your hit
+points, as well as in messages and the status line.  It clears when the
+poison ends.
+
+Learning and using magic
+------------------------
+
+Formula, prayer, practice and ritual are the different realms' names for
+book magic.  Learning one does NOT make it a passive ability or set it
+working.
+
+  Learn magic   (under More, or on a book in your pack) learn magic from
+                a book, when your class has a study slot free
+  Use magic     (on the right-hand buttons, under More, or on a book)
+                choose its book, then the learned magic
+  Browse        (under More, or on a book) read a book without using it
+
+Carry the book so it is there when you need it.  Outside caves a book
+on the floor at your feet also serves; in a cave it must be in your pack.  The list shows the level needed, the Focus each attempt
+costs, the chance of failure and whether you have learned it.  Details
+hides or shows the descriptions.  You can highlight anything in the list
+to read about it, but only eligible magic can be used or learned: "Not
+learned" means you must leave the list and Learn magic first; being the
+right level is not enough.  An attempt takes time and Focus even when it
+fails.  Without enough Focus you can risk overexertion, which may make
+you faint or harm your Constitution.  Backing out of the list is free.
+
+Remove Hunger is a one-off top-up to roughly half fed when you are below
+that.  It does nothing if you are already at least half fed, and does
+not slow digestion afterwards: use it again when you are hungry.  A
+protection such as Resist Poison likewise lasts only for its duration
+once used.  By contrast an item's Slow Digestion works by itself while
+worn; learning magic has nothing to do with it.
+
+Abilities (under More) describes your origin and class traits and when
+they apply.  It is not where learned book magic is used.
+
+Battery and performance
+-----------------------
+
+The game draws only what changes and sleeps while it waits for you.
+Hiding the weather under Display / Performance helps on older devices;
+it changes nothing in play.  Some uncommon screens still use the
+original text layout; they work the same way, with the d-pad, OK and
+Back.

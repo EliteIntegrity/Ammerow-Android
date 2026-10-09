@@ -1,0 +1,11 @@
+# Text files keep LF line endings in every checkout, whatever the local Git
+# settings: the game's data files and the build must match on every platform.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.jar binary
+*.png binary
+*.ttf binary
+*.ogg binary
+*.wav binary

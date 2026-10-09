@@ -1,0 +1,206 @@
+Touch Controls
+==============
+
+The buttons are in three places.  Their positions never change; only the
+labels on the right-hand buttons follow what you are doing.  The rule for
+those: they are what you can do with whatever is in focus, best first -
+the square you stand on, the item, spell or square you have highlighted,
+or the question you are asked.
+
+The side column
+---------------
+
+At the screen's edge (on the camera's side, if the screen has one):
+
+Menu    the in-game menu: settings, help, save and return home
+Inv     your pack
+More    every command, in groups; tap one, or Done to close; hold one
+        to put it on the quick bar.  Commands at the end opens the
+        game's own menu of every command.
+Help    this field guide
+Map     the whole level
+Log     earlier messages (or tap the recent messages at the top right);
+        Find searches them
+Char    your character dossier; Next page (or the d-pad's left and right)
+        turns its pages, and Rename renames you
+
+These work from inside other screens too: the screen closes first.
+Pressed again while its own screen is open, Inv, Help, Map, Log and Char
+close it.  On Home and the screens reached from it, and while creating a
+character, only Menu and Help are shown.
+
+The d-pad
+---------
+
+Slide or press in any of eight directions to walk one step.  Keep your
+thumb down to keep walking.  The centre, marked Wait, waits a turn; keep
+your thumb on it to keep waiting, until something comes into view.  In a
+cave, waiting on stable ground is how stamina comes back.  In menus and
+lists the d-pad moves the highlight, and left and right change tabs.
+It is drawn faintly so the map and text show through it, and a touch
+just outside its ring still counts as the d-pad.
+
+The right-hand buttons
+----------------------
+
+On the map the large button does the obvious thing where you stand:
+
+  Wait      wait a turn, when nothing else applies
+  Get       pick up what is here
+  Down, Up  take the stairs
+  Enter     go down into a cave mouth or hole
+  Shop      go into the shop whose door you are on
+  Fish      start fishing beside water
+  Open      open the door next to you
+
+Around it are Rest (as long as needed), your ranged attack and Look (or
+Wait, when the large button is busy with something else).  On the
+surface, Travel (the known world) takes the ranged attack's place until
+something comes into view.  Explore, which walks to the nearest
+unexplored spot, is under More, with Up, Down and Travel.
+
+When a monster comes into view, the large button becomes your ranged
+attack: Fire (with a launcher and ammunition for it), otherwise Use magic
+(once you have learned some), otherwise Throw (a throwing weapon or a
+flask of oil).  Each asks which ammunition, magic or missile, then where:
+Nearest, At target (once you have one), Choose, the d-pad, or a tap on
+the monster.  Without a ranged
+attack the large button is Wait: let the monster come to you.  Look and
+what your square offers sit beside it; Rest goes, since resting stops for
+a monster in sight.  To fight hand to hand, walk into the monster.
+
+Once you have fired, used magic or thrown, the large button does it
+again - Fire again, Use again or Throw again, with what it uses written
+under it: the same ammunition, magic or missile at the same target, in
+one tap.  When that target has gone it asks where (Nearest is the large
+button then).  Fire, Use magic or Throw beside it starts afresh, to
+choose other ammunition or another target.  Fire nearest (under More, and can go on
+the quick bar) fires the first ammunition in your quiver at the closest
+monster without asking.
+
+Just after the game changes the large button, it ignores taps for a
+moment, so a tap meant for the old action cannot trigger the new one.
+
+Your pack and equipment
+-----------------------
+
+Inv opens your pack; the d-pad's left and right show your equipment,
+quiver and the floor.  Tap an item to highlight it, and the buttons
+become what you can do with it: the large one is its use (Quaff, Read,
+Eat, Aim, Wield or Wear, Take off, Fire, Pick up...), next to it are Back,
+Inspect and one more, and the rest (Drop, Throw, Inscribe, Ignore...) are
+in a row beside the d-pad.  A dimmed one cannot be done just now, such as
+aiming an empty wand.  Tap the highlighted item again for the full list
+in the game's own menu.  After Inspect you come back to the list.
+
+The quick bar
+-------------
+
+The row of slots along the bottom of the map (in a cave, just above its
+status lines) holds what this character keeps reaching for.  To fill a
+slot:
+
+  an item   highlight it in your pack, equipment or quiver and press Pin:
+            its main use (Quaff, Read, Eat, Aim, Wield, Take off, Fire,
+            Throw...) goes on the bar
+  magic     highlight it in a book's list when using or browsing it and
+            press Pin
+  anything  under More, hold a command
+
+Tap a slot to use it; the game asks only what it must, such as a
+direction.  An item slot shows how many you have, and greys out when you
+have none.  Hold a slot to empty it.  The small button at the bar's left
+shows more rows.  Each character keeps their own slots.
+
+Looking and targeting
+---------------------
+
+Look shows what is around you.  Move its cursor with the d-pad, Next and
+Prev, or tap a square, and the buttons follow what it is on:
+
+  a monster  Target (to fire or cast at it later with At target), Recall
+             (what you know of it), Next
+  an item    Walk to, Next, Prev
+  a place    Walk to, Next, Prev
+
+When choosing a target to aim at, the large button is Target.  The card
+describing the monster, item or place shows only while you look or
+choose; afterwards your target keeps its highlight on the map.
+
+Magic
+-----
+
+Use magic or Learn magic shows the book's list: tap an entry, or
+highlight it and press Use (or Learn).  Details hides or shows what each
+does.  Learning magic does not set it working: use it from its book each
+time you need it (see 'interface.txt').
+
+Touching the map
+----------------
+
+Tap      walk to that square by the shortest known path; a tap next to
+         you steps or attacks there.  Squares you have not seen yet are
+         ignored, so a finger that misses a button does not send you
+         wandering into the unknown (the d-pad or Explore go there)
+Hold     open the game's menu for that square; on yourself it lists
+         every action (use, cast, rest, stairs, pick up and more)
+Pinch    zoom the map in and out
+
+Back
+----
+
+Android's Back button is the game's Escape: it cancels a prompt, closes a
+screen, or opens the in-game menu.  With the More drawer open it closes
+the drawer.
+
+Prompts
+-------
+
+The buttons change for each kind of question:
+
+  -more-               Next (or Skip)
+  a card               (the opening story, a quest briefing, a
+                       donation's receipt) OK, Back or a tap goes on
+  menus and lists      tap a row, or OK, Back, PgUp, PgDn
+  which item?          tap it (or move to it with the d-pad and press OK)
+  yes or no            Yes, No
+  how many             the digit buttons, then OK; All takes everything
+  a direction or aim   the d-pad fires that way; Nearest aims at the
+                       closest enemy; Choose picks a target; At target
+                       uses the one you already chose; or tap a monster
+  a name               OK, Random, or Type... for the on-screen keyboard
+
+The on-screen keyboard appears only when you ask for it (Type..., or
+Keyboard under More) and closes when the prompt ends.
+
+Shops
+-----
+
+Tap an item to highlight it; Buy and Examine act on it.  Tap the
+highlighted item again for the game's own menu for it (Examine, Buy,
+Buy one).  Sell offers your own items: tap the one to sell.  Purchases
+and sales ask Yes or No.  At home the buttons are Take, Stash and
+Examine.  In the General Store, Donate gives your fishing catch to the
+village larder; a card then shows what it added, the XP it earned and
+the village's progress.
+
+Starting a run
+--------------
+
+New Run, then choose each part of your character, or press Random for a
+random choice and Auto to finish the whole character at random.  Leave
+the name blank and press OK (or press Random) for a random name.  Options
+(beside the d-pad) shows the birth options.  Attributes are bought with
+the d-pad's left and right (Reset starts again), or rolled: Reroll for a
+new roll, Previous to bring back the last.
+
+After a character dies, New Run can offer a new character based on the
+previous one: Use as is, Redo, Change name, or Options.
+
+Load Run lists your saved runs: OK loads the highlighted one, and Delete
+removes it after asking Yes or No.  A character who has died is not
+listed there.
+
+Home also offers Lore (the world, its peoples, and Classes & Ranks),
+Memorial (scored expeditions), Help / Field Guide (this guide), Settings
+and About (the version, credits and licences).
