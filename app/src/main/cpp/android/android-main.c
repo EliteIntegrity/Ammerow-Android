@@ -385,21 +385,25 @@ static int smallest_width_dp(void)
 }
 
 /*
- * The Android default layout, applied once (and again only if LAYOUT_VERSION
- * rises): the message history at the top right, where the touch controls
- * leave room, four lines deep on a phone and six on a tablet. It edits the
- * frontend's own settings file before the game reads it, so it is the
- * player's setting from then on, changed in Settings like any other.
+ * The Android default layout, applied once per version (LAYOUT_VERSION):
+ * 1. the message history at the top right, where the touch controls leave
+ *    room, four lines deep on a phone and six on a tablet;
+ * 2. on a phone, Comfortable interface size (100 x 30) instead of the
+ *    desktop's Standard (120 x 36), whose text is too small to read there.
+ *    An update moves only a phone still on Standard; Large would put the
+ *    sidebar's health and stamina under the d-pad.
+ * It edits the frontend's own settings file before the game reads it, so it
+ * is the player's setting from then on, changed in Settings like any other.
  */
 #define LAYOUT_MARKER "lib/user/android-layout.txt"
-#define LAYOUT_VERSION 1
+#define LAYOUT_VERSION 2
 #define SETTINGS_PATH "lib/user/Ammerow/" SDL3_CONFIG_FILE
 
 static void apply_default_layout(void)
 {
 	char lines[64][160];
-	int count = 0, applied = 0, rows, i;
-	bool saw_placement = false, saw_rows = false;
+	int count = 0, applied = 0, rows, width, i;
+	bool saw_placement = false, saw_rows = false, saw_density = false, phone;
 	FILE *fp = fopen(LAYOUT_MARKER, "r");
 
 	if (fp) {
@@ -407,7 +411,9 @@ static void apply_default_layout(void)
 		fclose(fp);
 	}
 	if (applied >= LAYOUT_VERSION) return;
-	rows = smallest_width_dp() >= 600 ? 6 : 4;
+	width = smallest_width_dp();
+	rows = width >= 600 ? 6 : 4;
+	phone = width > 0 && width < 600;
 
 	fp = fopen(SETTINGS_PATH, "r");
 	if (fp) {
@@ -415,12 +421,24 @@ static void apply_default_layout(void)
 				fgets(lines[count], sizeof(lines[count]), fp)) {
 			lines[count][strcspn(lines[count], "\r\n")] = '\0';
 			if (strncmp(lines[count], "dock_placement=", 15) == 0) {
-				snprintf(lines[count], sizeof(lines[count]), "dock_placement=%d",
-					(int)SDL3_DOCK_TOP_RIGHT);
+				if (applied < 1) {
+					snprintf(lines[count], sizeof(lines[count]),
+						"dock_placement=%d", (int)SDL3_DOCK_TOP_RIGHT);
+				}
 				saw_placement = true;
 			} else if (strncmp(lines[count], "dock_rows=", 10) == 0) {
-				snprintf(lines[count], sizeof(lines[count]), "dock_rows=%d", rows);
+				if (applied < 1) {
+					snprintf(lines[count], sizeof(lines[count]), "dock_rows=%d",
+						rows);
+				}
 				saw_rows = true;
+			} else if (strncmp(lines[count], "interface_density=", 18) == 0) {
+				if (phone && applied < 2 &&
+						atoi(lines[count] + 18) == SDL3_INTERFACE_STANDARD) {
+					snprintf(lines[count], sizeof(lines[count]),
+						"interface_density=%d", (int)SDL3_INTERFACE_COMFORTABLE);
+				}
+				saw_density = true;
 			}
 			count++;
 		}
@@ -435,6 +453,10 @@ static void apply_default_layout(void)
 			(int)SDL3_DOCK_TOP_RIGHT);
 	}
 	if (!saw_rows) snprintf(lines[count++], sizeof(lines[0]), "dock_rows=%d", rows);
+	if (phone && !saw_density) {
+		snprintf(lines[count++], sizeof(lines[0]), "interface_density=%d",
+			(int)SDL3_INTERFACE_COMFORTABLE);
+	}
 
 	{
 		char path[] = SETTINGS_PATH;
@@ -454,8 +476,8 @@ static void apply_default_layout(void)
 		fprintf(fp, "%d\n", LAYOUT_VERSION);
 		fclose(fp);
 	}
-	SDL_Log("Applied the Android default layout (messages top right, %d lines)",
-		rows);
+	SDL_Log("Applied the Android default layout, version %d (messages top right, "
+		"%d lines%s)", LAYOUT_VERSION, rows, phone ? "; phone text size" : "");
 }
 
 /*

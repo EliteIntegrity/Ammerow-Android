@@ -33,7 +33,7 @@ licence:GNU General Public License version 2; compatible file-level notices reta
 notice:Ammerow began from Angband upstream commit 5c45eb9588b8227d4f1b1998e0a627ad7ee11a75, 174 commits after the Angband 4.2.6 release. Copyright in inherited work remains with its respective authors.
 notice:Ammerow is distributed under GPLv2. The inherited alternative Angband licence and contributor notices are preserved; the alternative licence's non-commercial restriction is not an additional restriction on the GPLv2 distribution.
 notice:The complete corresponding source and build scripts for this Android edition are included in this APK as assets/source/Ammerow-Android-source.zip (an APK is a ZIP file). No Internet connection or separate purchase is needed.
-notice:Public source repository: https://github.com/EliteIntegrity/Ammerow-Android, each release tagged with its Android version (this one: v0.1.0-android.2). The included source archive corresponds to this release; a newer repository revision is not a substitute.
+notice:Public source repository: https://github.com/EliteIntegrity/Ammerow-Android, each release tagged with its Android version (this one: v0.1.0-android.3). The included source archive corresponds to this release; a newer repository revision is not a substitute.
 notice:The program is supplied without warranty to the extent permitted by law. See COPYING for the full GPLv2 terms and warranty disclaimer. Asset restrictions do not limit rights in the GPL-covered program or separately licensed third-party components.
 source:COPYING; NOTICE.md; AUTHORS.md; docs/copying.rst; docs/thanks.rst; assets/source/Ammerow-Android-source.zip
 end:

@@ -63,8 +63,11 @@ static const struct rewrite lines[] = {
 		"Back returns home   Help opens the field guide" },
 	{ "MOUSE OR ARROWS SELECT   ENTER CONFIRMS   F1 HELP",
 		"TAP A CHOICE   OK CONFIRMS   HELP OPENS THE GUIDE" },
+	/* Settings: a tap changes any setting, round to the first value again
+	 * (frontend-settings.c), so it does not count on the d-pad, which Home
+	 * does not show. */
 	{ "Click cycles   Arrows select/change   Escape categories   F1 / ? manual",
-		"Tap cycles   D-pad selects and changes   Back for categories   Help opens the guide" },
+		"Tap cycles   Back for categories   Help opens the guide" },
 	{ "PgUp/PgDn / wheel scroll   Esc home", "PgUp/PgDn scroll   Back returns home" },
 
 	/* Prompts */

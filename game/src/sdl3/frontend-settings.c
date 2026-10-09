@@ -328,6 +328,48 @@ void sdl3_frontend_change_selected_setting(struct sdl3_app *app, int delta)
 	}
 }
 
+/* Whether the setting stops at its first and last values rather than
+ * cycling by itself. */
+static bool setting_has_ends(enum sdl3_settings_row row)
+{
+	switch (row) {
+	case SDL3_SETTINGS_INTERFACE_DENSITY:
+	case SDL3_SETTINGS_ZOOM:
+	case SDL3_SETTINGS_DOCK_SIZE:
+	case SDL3_SETTINGS_AUDIO_MASTER:
+	case SDL3_SETTINGS_AUDIO_MUSIC:
+	case SDL3_SETTINGS_AUDIO_INTERFACE:
+	case SDL3_SETTINGS_AUDIO_GAMEPLAY:
+	case SDL3_SETTINGS_AUDIO_CREATURE:
+	case SDL3_SETTINGS_AUDIO_AMBIENT:
+		return true;
+	default:
+		return false;
+	}
+}
+
+/* A click, tap, Enter or Right moves the selected setting on, and past the
+ * last value of one that stops at its ends it comes back round to the first:
+ * with only a pointer, Interface size could otherwise get smaller and never
+ * larger again. */
+static void cycle_selected_setting(struct sdl3_app *app)
+{
+	struct sdl3_config before;
+	int step;
+
+	memcpy(&before, &app->config, sizeof(before));
+	sdl3_frontend_change_selected_setting(app, 1);
+	if (!setting_has_ends(app->settings.selected_row) ||
+			memcmp(&before, &app->config, sizeof(before)) != 0) {
+		return;
+	}
+	for (step = 0; step < 64; step++) {
+		memcpy(&before, &app->config, sizeof(before));
+		sdl3_frontend_change_selected_setting(app, -1);
+		if (memcmp(&before, &app->config, sizeof(before)) == 0) break;
+	}
+}
+
 void sdl3_frontend_activate_settings_selection(struct sdl3_app *app)
 {
 	int ui_sound;
@@ -336,7 +378,7 @@ void sdl3_frontend_activate_settings_selection(struct sdl3_app *app)
 	if (sdl3_settings_activate(&app->settings)) {
 		ui_sound = MSG_UI_ACCEPT;
 	} else {
-		sdl3_frontend_change_selected_setting(app, 1);
+		cycle_selected_setting(app);
 		ui_sound = MSG_UI_CHANGE;
 	}
 	sdl3_grid_mark_dirty(&app->grid);
