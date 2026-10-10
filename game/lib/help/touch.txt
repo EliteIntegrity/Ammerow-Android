@@ -45,7 +45,8 @@ The right-hand buttons
 
 On the map the large button does the obvious thing where you stand:
 
-  Wait      wait a turn, when nothing else applies
+  Explore   walk to the nearest spot you have not seen yet, when nothing
+            else applies; tap it again to go on
   Get       pick up what is here
   Down, Up  take the stairs
   Enter     go down into a cave mouth or hole
@@ -54,10 +55,11 @@ On the map the large button does the obvious thing where you stand:
   Open      open the door next to you
 
 Around it are Rest (as long as needed), your ranged attack and Look (or
-Wait, when the large button is busy with something else).  On the
+Explore, when the large button is busy with something else).  On the
 surface, Travel (the known world) takes the ranged attack's place until
-something comes into view.  Explore, which walks to the nearest
-unexplored spot, is under More, with Up, Down and Travel.
+something comes into view.  Explore stops when it gets there, or when
+something comes into view, and does not start with a monster in sight.
+To wait a turn, tap the centre of the d-pad.
 
 When a monster comes into view, the large button becomes your ranged
 attack: Fire (with a launcher and ammunition for it), otherwise Use magic

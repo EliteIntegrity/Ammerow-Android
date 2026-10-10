@@ -292,11 +292,6 @@ int context_menu_player(int mx, int my)
 	/* 'C' is used for the character sheet in both keymaps. */
 	menu_dynamic_add_label(m, "Character", 'C', MENU_VALUE_CHARACTER, labels);
 
-	if (!OPT(player, center_player)) {
-		menu_dynamic_add_label(m, "^Center Map", 'L', MENU_VALUE_CENTER_MAP,
-							   labels);
-	}
-
 	menu_dynamic_add_label(m, "Other", ' ', MENU_VALUE_OTHER, labels);
 
 	/* No flush needed */
@@ -342,7 +337,6 @@ int context_menu_player(int mx, int my)
 		case MENU_VALUE_CHARACTER:
 		case MENU_VALUE_OTHER:
 		case MENU_VALUE_FLOOR:
-		case MENU_VALUE_CENTER_MAP:
 			allowed = true;
 			break;
 
@@ -394,10 +388,6 @@ int context_menu_player(int mx, int my)
 
 		case MENU_VALUE_FLOOR:
 			context_menu_player_display_floor();
-			break;
-
-		case MENU_VALUE_CENTER_MAP:
-			do_cmd_center_map();
 			break;
 
 		default:

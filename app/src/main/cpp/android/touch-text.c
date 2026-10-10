@@ -66,7 +66,7 @@ static const struct rewrite lines[] = {
 	/* Settings: a tap changes any setting, round to the first value again
 	 * (frontend-settings.c), so it does not count on the d-pad, which Home
 	 * does not show. */
-	{ "Click cycles   Arrows select/change   Escape categories   F1 / ? manual",
+	{ "Click/Enter changes   Arrows select/change   Esc back   F1/? guide",
 		"Tap cycles   Back for categories   Help opens the guide" },
 	{ "PgUp/PgDn / wheel scroll   Esc home", "PgUp/PgDn scroll   Back returns home" },
 
@@ -462,7 +462,7 @@ static bool hint_a_row_high(const char *text)
 		"Escape returns home   F1",
 		"Escape returns to About",
 		"Up/Down scroll   ",
-		"Click cycles   ",
+		"Click/Enter changes   ",
 		"Escape returns to the game menu",
 	};
 	size_t i;

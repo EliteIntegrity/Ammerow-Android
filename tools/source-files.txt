@@ -36,6 +36,7 @@ app/src/main/res/xml/data_extraction_rules.xml
 build.gradle.kts
 docs/copying.rst
 docs/thanks.rst
+game/CHANGELOG.md
 game/CMakeLists.txt
 game/README.md
 game/assets/font/CozetteVector.ttf
@@ -672,6 +673,7 @@ game/src/tests/sdl3/input.c
 game/src/tests/sdl3/inspect-card.c
 game/src/tests/sdl3/item-screen.c
 game/src/tests/sdl3/layout.c
+game/src/tests/sdl3/map-presenter.c
 game/src/tests/sdl3/monster-art.c
 game/src/tests/sdl3/monster-card-data.c
 game/src/tests/sdl3/monster-card-layout.c
@@ -1008,8 +1010,12 @@ game/tests/birth/new-game-0/input
 game/tests/birth/new-game-0/output
 game/tests/birth/new-game-1/input
 game/tests/birth/new-game-1/output
+game/tests/headless/scenarios/camera-south-edge.scn
+game/tests/headless/scenarios/camera-west-edge.scn
 game/tests/headless/scenarios/cave-fatal-fall.scn
 game/tests/headless/scenarios/cave-larder-loop.scn
+game/tests/headless/scenarios/hud-bottom-large.scn
+game/tests/headless/scenarios/settings-large.scn
 game/tests/headless/scenarios/smoke.scn
 game/tests/run-test
 game/tests/trivial/matcher/input

@@ -290,7 +290,8 @@ data class Dpad(
 object ControlLayouts {
     private val ok = Command("OK", Action.Key(Keys.RETURN))
     private val back = Command("Back", Action.Key(Keys.ESCAPE))
-    // The game's auto-explore walks only to the nearest unexplored spot, so it is under More rather than on the map's buttons.
+    // The game's auto-explore: each press walks to the nearest unexplored spot. It does
+    // nothing with a monster in view, so the map's buttons offer it only when none is.
     private val explore = cmd("Explore", 'p')
     // Rest asks how long; Return takes the default, "as needed".
     private val rest = Command("Rest", Action.Keys(listOf(typed('R'), Action.Key(Keys.RETURN))))
@@ -417,11 +418,12 @@ object ControlLayouts {
 
     /**
      * The map: the large button is what this square offers (Get, Down, Shop,
-     * ...) or Wait. With a monster in view it is the best ranged attack
-     * instead, and what the square offers (or Wait) moves beside it. Once
-     * the character has shot, cast or thrown at it, the large button does
-     * that again, with the attack from the start beside it. On the surface
-     * with nothing in view, Travel (the known world) takes the attack's place.
+     * ...) or, with nothing in view, Explore. With a monster in view it is
+     * the best ranged attack instead, and what the square offers (or Wait)
+     * moves beside it. Once the character has shot, cast or thrown at it, the
+     * large button does that again, with the attack from the start beside it.
+     * On the surface with nothing in view, Travel (the known world) takes the
+     * attack's place. Waiting a turn is the d-pad's centre.
      */
     private fun mapCluster(context: GameContext, verbs: List<Verb>): Cluster {
         val attacks = attacks(context)
@@ -429,8 +431,9 @@ object ControlLayouts {
         val placeHere = context.primary != Primary.NONE
         if (!context.has(ContextFlags.MONSTER_IN_VIEW)) {
             val second = if (context.has(ContextFlags.TRAVEL)) travel else attacks.firstOrNull()
-            // Wait stays one tap away when the big button is busy with something else.
-            return Cluster(place, listOf(rest, second, if (placeHere) hold else look))
+            // Explore stays one tap away when the big button is busy with something else.
+            return if (placeHere) Cluster(place, listOf(rest, second, explore))
+            else Cluster(explore, listOf(rest, second, look))
         }
         again(context, verbs)?.let { again ->
             // Then what the square offers (stairs to escape by), another attack, or Wait.
@@ -682,7 +685,7 @@ object ControlLayouts {
         ),
         "Game" to listOf(
             Command("Zoom out", Action.Key(Keys.MINUS, Keys.MOD_CTRL)), Command("Zoom in", Action.Key(Keys.EQUALS, Keys.MOD_CTRL)),
-            Command("Centre", ctrl('l')), cmd("Options", '='), cmd("Help", '?'), Command("Save", ctrl('s')),
+            cmd("Options", '='), cmd("Help", '?'), Command("Save", ctrl('s')),
             Command("Keyboard", Action.Keyboard),
             // The game's own menu of every command, by category.
             Command("Commands", Action.Key(Keys.RETURN)),

@@ -207,6 +207,11 @@ void sdl3_frontend_change_stats_visibility(struct sdl3_app *app)
 {
 	if (!app) return;
 	app->config.hud_stats_visible = !app->config.hud_stats_visible;
+	if (!sdl3_frontend_apply_dock_layout(app, app->config.dock_visible,
+			app->config.dock_placement, app->config.dock_rows,
+			app->config.dock_cols)) {
+		app->config.hud_stats_visible = !app->config.hud_stats_visible;
+	}
 	sdl3_grid_mark_dirty(&app->grid);
 }
 
@@ -329,11 +334,10 @@ void sdl3_frontend_change_selected_setting(struct sdl3_app *app, int delta)
 }
 
 /* Whether the setting stops at its first and last values rather than
- * cycling by itself. */
+ * cycling by itself, as interface size does. */
 static bool setting_has_ends(enum sdl3_settings_row row)
 {
 	switch (row) {
-	case SDL3_SETTINGS_INTERFACE_DENSITY:
 	case SDL3_SETTINGS_ZOOM:
 	case SDL3_SETTINGS_DOCK_SIZE:
 	case SDL3_SETTINGS_AUDIO_MASTER:
@@ -350,8 +354,8 @@ static bool setting_has_ends(enum sdl3_settings_row row)
 
 /* A click, tap, Enter or Right moves the selected setting on, and past the
  * last value of one that stops at its ends it comes back round to the first:
- * with only a pointer, Interface size could otherwise get smaller and never
- * larger again. */
+ * with only a pointer, map zoom or a volume could otherwise go one way and
+ * never back. */
 static void cycle_selected_setting(struct sdl3_app *app)
 {
 	struct sdl3_config before;
