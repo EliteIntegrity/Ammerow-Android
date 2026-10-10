@@ -1030,6 +1030,8 @@ static const struct side_handler_t
 	{ prt_depth,   15, EVENT_DUNGEONLEVEL }, /* Floor or surface danger */
 };
 
+int (*sidebar_covered_rows_hook)(void);
+
 
 /**
  * This prints the sidebar, using a clever method which means that it will only
@@ -1058,8 +1060,12 @@ static void draw_sidebar(game_event_type type, bool force)
 
 	Term_get_size(&x, &y);
 
-	/* Keep the top and bottom lines clear. */
+	/* Keep the top and bottom lines clear, and any rows at the foot that a
+	 * frontend's own controls cover. */
 	max_priority = y - 2;
+	if (sidebar_covered_rows_hook) {
+		max_priority -= MAX(0, sidebar_covered_rows_hook());
+	}
 	for (i = 0; i < N_ELEMENTS(side_handlers); i++) {
 		const struct side_handler_t *hnd = &side_handlers[i];
 		shown[i] = ABS(hnd->priority) <= max_priority &&

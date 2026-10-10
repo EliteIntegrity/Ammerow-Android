@@ -37,8 +37,10 @@ change.  Where the d-pad shows, its left and right step a setting back
 and forward.  Back returns to the list of pages.
 
 Interface size sets how large the text is.  On a phone it starts at
-Comfortable; Large is easier to read, though the sidebar's health and
-stamina then sit under the d-pad.
+Comfortable.  Larger text leaves less room beside the d-pad: the sidebar
+then leaves out its less important lines (your race, title and class
+first), a look card may leave out its picture, and on Large some menus
+run under the buttons.
 
 Character creation
 ------------------

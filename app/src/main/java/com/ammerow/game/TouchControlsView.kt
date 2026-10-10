@@ -49,14 +49,14 @@ class TouchControlsView(context: Context) : View(context) {
     /** Reports how far the right-hand buttons reach in from the game's right edge (view pixels). */
     var onClusterWidthChanged: ((Float) -> Unit)? = null
 
-    /** Reports how far the right-hand buttons reach up from the game's bottom edge (view pixels). */
-    var onClusterHeightChanged: ((Float) -> Unit)? = null
+    /** Reports how far the d-pad and the right-hand buttons reach up from the drawing's bottom edge, the higher of them (view pixels). */
+    var onControlsHeightChanged: ((Float) -> Unit)? = null
 
     /** Reports how far the quick bar reaches up from the game's bottom edge (view pixels). */
     var onBarHeightChanged: ((Float) -> Unit)? = null
 
-    /** Reports how far the d-pad reaches in from the drawing's left edge (view pixels). */
-    var onPadRightChanged: ((Float) -> Unit)? = null
+    /** Reports how far the d-pad reaches in from the drawing's left edge and up from its bottom edge (view pixels). */
+    var onPadChanged: ((Float, Float) -> Unit)? = null
 
     /** Shows a short note over the game. */
     var onNotice: ((String) -> Unit)? = null
@@ -356,7 +356,7 @@ class TouchControlsView(context: Context) : View(context) {
         padRadius = min(dp(if (tablet) 88f else 72f), game.height() * 0.21f)
         padX = game.left + dp(22f) + padRadius
         padY = game.bottom - margin - padRadius
-        onPadRightChanged?.invoke(padX + padRadius + dp(8f) - drawing.left)
+        onPadChanged?.invoke(padX + padRadius + dp(8f) - drawing.left, drawing.bottom - (padY - padRadius))
 
         // Cluster: a large button in the corner and three on an arc around it.
         val big = min(dp(40f), game.height() * 0.12f)
@@ -382,7 +382,9 @@ class TouchControlsView(context: Context) : View(context) {
         }
         val clusterLeft = quickButtons.minOf { it.rect.left }
         onClusterWidthChanged?.invoke(game.right - clusterLeft + dp(4f))
-        onClusterHeightChanged?.invoke(game.bottom - quickButtons.minOf { it.rect.top } + dp(4f))
+        // The look card stops above the controls along the bottom, the same height on either side.
+        val controlsTop = min(padY - padRadius, quickButtons.minOf { it.rect.top })
+        onControlsHeightChanged?.invoke(drawing.bottom - controlsTop + dp(4f))
 
         // Digits: one row along the bottom, left of the cluster (the d-pad is hidden then),
         // above the hint row like the d-pad.

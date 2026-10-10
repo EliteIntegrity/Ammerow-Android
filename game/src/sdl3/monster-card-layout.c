@@ -20,6 +20,13 @@
 #define MONSTER_CARD_COMPACT_PORTRAIT_ROWS 7
 #define MONSTER_CARD_PORTRAIT_TOP 5
 #define MONSTER_CARD_DETAIL_RESERVE 9
+/* Shorter than MONSTER_CARD_MIN_ROWS (a host's controls cover the foot of the
+ * map), a card keeps its facts and gives up its portrait: down to the
+ * smallest that still holds the card's glyph, drawn four rows high, and then
+ * altogether. The shortest card is its text alone. */
+#define MONSTER_CARD_SHORT_MIN_ROWS 10
+#define MONSTER_CARD_SHORT_PORTRAIT_ROWS 5
+#define MONSTER_CARD_SHORT_DETAIL_ROWS 6
 
 static int maximum(int a, int b)
 {
@@ -46,7 +53,7 @@ bool sdl3_monster_card_layout_compute(
 	if (!layout) return false;
 	memset(layout, 0, sizeof(*layout));
 	if (view_col < 0 || view_row < 0 || view_cols < MONSTER_CARD_MIN_COLS + 8 ||
-			view_rows < MONSTER_CARD_MIN_ROWS || cell_width <= 0 ||
+			view_rows < MONSTER_CARD_SHORT_MIN_ROWS || cell_width <= 0 ||
 			cell_height <= 0) {
 		return false;
 	}
@@ -57,7 +64,7 @@ bool sdl3_monster_card_layout_compute(
 		card_view_row++;
 		card_view_rows--;
 	}
-	if (card_view_rows < MONSTER_CARD_MIN_ROWS) return false;
+	if (card_view_rows < MONSTER_CARD_SHORT_MIN_ROWS) return false;
 	layout->panel_cols = maximum(MONSTER_CARD_MIN_COLS,
 		(view_cols * width_percent) / 100);
 	layout->panel_cols = minimum(layout->panel_cols, view_cols - 8);
@@ -65,7 +72,7 @@ bool sdl3_monster_card_layout_compute(
 		(card_view_rows * MONSTER_CARD_COMPACT_HEIGHT_PERCENT) / 100);
 	layout->panel_rows = minimum(layout->panel_rows, card_view_rows);
 	if (layout->panel_cols < MONSTER_CARD_MIN_COLS ||
-			layout->panel_rows < MONSTER_CARD_MIN_ROWS) {
+			layout->panel_rows < MONSTER_CARD_SHORT_MIN_ROWS) {
 		memset(layout, 0, sizeof(*layout));
 		return false;
 	}
@@ -95,6 +102,13 @@ bool sdl3_monster_card_layout_compute(
 	} else {
 		layout->portrait_rows = MONSTER_CARD_COMPACT_PORTRAIT_ROWS;
 	}
+	if (layout->panel_rows < MONSTER_CARD_MIN_ROWS) {
+		int room = layout->panel_rows - 1 - MONSTER_CARD_PORTRAIT_TOP -
+			MONSTER_CARD_SHORT_DETAIL_ROWS;
+
+		layout->portrait_rows = room < MONSTER_CARD_SHORT_PORTRAIT_ROWS ? 0 :
+			minimum(layout->portrait_rows, room);
+	}
 	layout->detail_row = layout->portrait_row + layout->portrait_rows;
 	layout->detail_end = layout->panel_row + layout->panel_rows - 1;
 	return true;
@@ -108,3 +122,6 @@ bool sdl3_monster_card_layout_compute(
 #undef MONSTER_CARD_COMPACT_PORTRAIT_ROWS
 #undef MONSTER_CARD_PORTRAIT_TOP
 #undef MONSTER_CARD_DETAIL_RESERVE
+#undef MONSTER_CARD_SHORT_MIN_ROWS
+#undef MONSTER_CARD_SHORT_PORTRAIT_ROWS
+#undef MONSTER_CARD_SHORT_DETAIL_ROWS

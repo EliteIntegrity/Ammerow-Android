@@ -54,11 +54,11 @@ class AmmerowActivity : SDLActivity() {
             clusterWidth = width
             reportMapInsets()
         }
-        touchControls.onClusterHeightChanged = { height ->
+        touchControls.onControlsHeightChanged = { height ->
             NativeBridge.setCardInset(height.roundToInt().coerceAtLeast(0))
         }
-        touchControls.onPadRightChanged = { right ->
-            NativeBridge.setCornerInset(right.roundToInt().coerceAtLeast(0))
+        touchControls.onPadChanged = { right, height ->
+            NativeBridge.setCornerInset(right.roundToInt().coerceAtLeast(0), height.roundToInt().coerceAtLeast(0))
         }
         touchControls.onBarHeightChanged = { height ->
             barHeight = height

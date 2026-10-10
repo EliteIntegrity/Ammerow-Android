@@ -32,6 +32,14 @@ extern const char *stat_names[STAT_MAX];
 extern const char *stat_names_reduced[STAT_MAX];
 extern const char *window_flag_desc[32];
 
+/**
+ * Set by a frontend whose own controls cover the foot of the left-hand
+ * sidebar (a touch screen's d-pad), to say how many of its rows they cover:
+ * the sidebar keeps above them, leaving out its least important rows when
+ * they do not all fit, as on a shorter screen.
+ */
+extern int (*sidebar_covered_rows_hook)(void);
+
 uint8_t monster_health_attr(void);
 void cnv_stat(int val, char *out_val, size_t out_len);
 void allow_animations(void);

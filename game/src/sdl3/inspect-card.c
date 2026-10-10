@@ -143,23 +143,28 @@ void sdl3_inspect_card_draw(const struct sdl3_inspect_card *card,
 	draw_text(visual, card->status, text_col, layout.panel_row + 3, text_cols,
 		theme->accent);
 
-	portrait = (SDL_FRect) {
-		(float)(visual->origin_x + text_col * visual->cell_width),
-		(float)(visual->origin_y + layout.portrait_row * visual->cell_height),
-		(float)(text_cols * visual->cell_width),
-		(float)(layout.portrait_rows * visual->cell_height)
-	};
-	set_draw_color(renderer, (SDL_Color){
-		theme->canvas.r, theme->canvas.g, theme->canvas.b, 205
-	});
-	SDL_RenderFillRect(renderer, &portrait);
-	portrait_font = visual->card_font_loaded ? &visual->card_font :
-		&visual->font;
-	glyph_color = sdl3_theme_color(theme, card->attr);
-	if (!sdl3_monster_art_draw(&visual->monster_art, renderer,
-			visual->font.path, card->asset_key, &portrait)) {
-		sdl3_font_draw(portrait_font, (uint32_t)card->glyph, glyph_color,
-			portrait.x, portrait.y, portrait.w, portrait.h);
+	/* A card too short for a portrait (sdl3/monster-card-layout.c) is its
+	 * text alone. */
+	if (layout.portrait_rows > 0) {
+		portrait = (SDL_FRect) {
+			(float)(visual->origin_x + text_col * visual->cell_width),
+			(float)(visual->origin_y +
+				layout.portrait_row * visual->cell_height),
+			(float)(text_cols * visual->cell_width),
+			(float)(layout.portrait_rows * visual->cell_height)
+		};
+		set_draw_color(renderer, (SDL_Color){
+			theme->canvas.r, theme->canvas.g, theme->canvas.b, 205
+		});
+		SDL_RenderFillRect(renderer, &portrait);
+		portrait_font = visual->card_font_loaded ? &visual->card_font :
+			&visual->font;
+		glyph_color = sdl3_theme_color(theme, card->attr);
+		if (!sdl3_monster_art_draw(&visual->monster_art, renderer,
+				visual->font.path, card->asset_key, &portrait)) {
+			sdl3_font_draw(portrait_font, (uint32_t)card->glyph, glyph_color,
+				portrait.x, portrait.y, portrait.w, portrait.h);
+		}
 	}
 
 	/* Facts outrank flavor when the map panel is short.  Each populated lore
@@ -167,10 +172,15 @@ void sdl3_inspect_card_draw(const struct sdl3_inspect_card *card,
 	 * before the remaining space is used for the original description. */
 	detail_row = layout.detail_row;
 	detail_end = layout.detail_end;
-	draw_text(visual, card->details[0], text_col, detail_row++, text_cols,
-		theme->text);
-	draw_text(visual, card->details[1], text_col, detail_row++, text_cols,
-		theme->muted);
+	/* Facts a card does not have (a floor's) take no rows. */
+	if (card->details[0][0]) {
+		draw_text(visual, card->details[0], text_col, detail_row++,
+			text_cols, theme->text);
+	}
+	if (card->details[1][0]) {
+		draw_text(visual, card->details[1], text_col, detail_row++,
+			text_cols, theme->muted);
+	}
 	details[0] = card->details[2];
 	details[1] = card->details[3];
 	details[2] = card->details[4];

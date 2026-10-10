@@ -183,11 +183,56 @@ static int test_quiet_digestion_refreshes_but_no_change_does_not(void *state)
 	ok;
 }
 
+static int covered_rows;
+
+static int cover_rows(void)
+{
+	return covered_rows;
+}
+
+static bool sidebar_row_blank(int y)
+{
+	for (int x = 0; x < COL_MAP; x++) {
+		int attr;
+		wchar_t ch;
+		Term_what(x, y, &attr, &ch);
+		if (ch != L' ') return false;
+	}
+	return true;
+}
+
+static int test_sidebar_keeps_above_covered_rows(void *state)
+{
+	(void)state;
+	test_term.sidebar_mode = SIDEBAR_LEFT;
+	Term_resize(100, 24);
+	sidebar_covered_rows_hook = cover_rows;
+	covered_rows = 8;
+	Term_clear();
+	event_signal(EVENT_STATUS);
+	/* Fourteen rows are left above the covered eight: the meters and stats
+	 * are kept there, and nothing is drawn beneath them. */
+	require(find_text("HP ", COL_MAP, 1, 15) >= 1);
+	require(find_text("ST ", COL_MAP, 1, 15) >= 1);
+	require(find_text("AIR", COL_MAP, 1, 15) >= 1);
+	require(find_text("STR", COL_MAP, 1, 15) >= 1);
+	require(find_text("CON", COL_MAP, 1, 15) >= 1);
+	for (int y = 15; y < Term->hgt - 1; y++) require(sidebar_row_blank(y));
+	/* Uncovered again, the whole sidebar returns. */
+	covered_rows = 0;
+	event_signal(EVENT_STATUS);
+	require(find_text("HP ", COL_MAP, 1, Term->hgt - 1) >= 1);
+	require(!sidebar_row_blank(15));
+	sidebar_covered_rows_hook = NULL;
+	ok;
+}
+
 const char *suite_name = "ui/sidebar";
 struct test tests[] = {
 	{ "poison is adjacent to HP and does not overwrite map or footer", test_poison_appears_and_clears_without_overflow },
 	{ "topbar poison appears and clears", test_topbar_keeps_poison_next_to_hp },
 	{ "food effects refresh percentages within Fed", test_food_effects_refresh_within_fed_grade },
 	{ "quiet digestion refreshes; unchanged food does not", test_quiet_digestion_refreshes_but_no_change_does_not },
+	{ "sidebar keeps above rows a frontend covers", test_sidebar_keeps_above_covered_rows },
 	{ NULL, NULL }
 };

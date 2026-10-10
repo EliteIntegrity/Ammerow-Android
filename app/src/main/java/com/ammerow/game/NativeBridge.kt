@@ -46,10 +46,10 @@ object NativeBridge {
     /** Drawing pixels the rail covers at the left and right; the game's text keeps clear of them, the map does not. */
     @JvmStatic external fun setGridInsets(left: Int, right: Int)
 
-    /** Drawing pixels the d-pad reaches in from the left; the cave's status strip starts clear of it. */
-    @JvmStatic external fun setCornerInset(width: Int)
+    /** Drawing pixels the d-pad reaches in from the left and up from the bottom; the cave's status strip starts clear of it, and the sidebar keeps above it. */
+    @JvmStatic external fun setCornerInset(width: Int, height: Int)
 
-    /** Drawing pixels the right-hand buttons cover up from the bottom; the look card stops above them. */
+    /** Drawing pixels the d-pad and the right-hand buttons cover up from the bottom (the higher of them); the look card stops above them, on either side. */
     @JvmStatic external fun setCardInset(bottom: Int)
 
     /** Debug builds: records the next frame's text for a layout check (android/probe.c). */

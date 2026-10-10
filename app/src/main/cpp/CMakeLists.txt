@@ -119,6 +119,8 @@ target_link_options(main PRIVATE
     -Wl,--wrap=sdl3_presenter_point_to_cell
     -Wl,--wrap=do_cmd_help
     -Wl,--wrap=sdl3_monster_card_layout_compute
+    -Wl,--wrap=sdl3_visual_init
+    -Wl,--wrap=sdl3_visual_free
     -Wl,--wrap=sdl3_home_refresh_saves
     -Wl,--wrap=menu_select
     -Wl,--wrap=menu_dynamic_select

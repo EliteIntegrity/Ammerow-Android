@@ -658,17 +658,19 @@ JNIEXPORT void JNICALL Java_com_ammerow_game_NativeBridge_setMapInsets(JNIEnv *e
 
 /*
  * How far the d-pad in the bottom left corner reaches from the drawing's left
- * edge, in drawing pixels: the cave's status strip starts clear of it, so the
- * thumb on the pad hides none of it (src/sdl3/render.c).
+ * and bottom edges, in drawing pixels: the cave's status strip starts clear
+ * of it (src/sdl3/render.c) and the sidebar keeps above it (context.c), so
+ * the thumb on the pad hides none of either.
  */
 JNIEXPORT void JNICALL Java_com_ammerow_game_NativeBridge_setCornerInset(JNIEnv *env,
-	jclass cls, jint width)
+	jclass cls, jint width, jint height)
 {
 	SDL_Event event;
 
 	(void)env;
 	(void)cls;
 	sdl3_visual_set_corner_inset(width);
+	touch_set_pad_height(height);
 	SDL_zero(event);
 	event.type = SDL_EVENT_RENDER_TARGETS_RESET;
 	SDL_PushEvent(&event);

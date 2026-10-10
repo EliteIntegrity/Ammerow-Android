@@ -75,6 +75,10 @@ bool touch_call_activity(JNIEnv *env, jobject activity, const char *name,
 /* A short note over the game (an Android toast), from the game thread. */
 void touch_notice(const char *fmt, ...);
 
+/* How far the d-pad reaches up from the drawing's bottom, in drawing pixels
+ * (from the controls): the sidebar keeps above it. */
+void touch_set_pad_height(int height);
+
 /* ---- The quick bar (pins.c) ---- */
 
 /* At every game wait (game thread): pending requests, the current

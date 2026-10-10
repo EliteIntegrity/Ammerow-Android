@@ -53,6 +53,7 @@
 #include "target.h"
 #include "ui-birth-screen.h"
 #include "ui-context.h"
+#include "ui-display.h"
 #include "ui-help.h"
 #include "ui-menu.h"
 #include "ui-object-screen.h"
@@ -71,6 +72,8 @@
 #include "sdl3/inspect-card-presenter.h"
 #include "sdl3/monster-card-layout.h"
 #include "sdl3/presenter.h"
+#include "sdl3/render.h"
+#include "sdl3/render-internal.h"
 #include "sdl3/host.h"
 #include "touch.h"
 #include "world-entry.h"
@@ -1372,10 +1375,13 @@ void __wrap_textui_target(void)
 }
 
 /*
- * The card fills the map's height, on the side away from the cursor. On the
- * right it would run under the buttons in that corner, over the end of its
- * description, so there it stops above them (a shorter portrait, the facts
- * and description clear). The controls say how far up the buttons reach.
+ * The card fills the map's height, on the side away from the cursor, where
+ * it would run under the d-pad (on the left) or the buttons (on the right),
+ * over the end of its description. On either side it stops above the higher
+ * of them, so it is the same size wherever it goes; when that leaves too
+ * little room for its portrait, the game keeps the facts and shrinks or drops
+ * the portrait (src/sdl3/monster-card-layout.c). The controls say how far up
+ * they reach.
  */
 static SDL_AtomicInt card_inset;
 
@@ -1398,9 +1404,7 @@ bool __wrap_sdl3_monster_card_layout_compute(
 {
 	int inset = SDL_GetAtomicInt(&card_inset);
 
-	/* The cursor on the left half puts the card on the right. */
-	if (inset > 0 && cell_height > 0 && grid_output_height > 0 &&
-			cursor_col < view_col + view_cols / 2) {
+	if (inset > 0 && cell_height > 0 && grid_output_height > 0) {
 		int limit = grid_output_height - inset;
 		int bottom = grid_origin_y + (view_row + view_rows) * cell_height;
 		int rows = view_rows -
@@ -1415,6 +1419,58 @@ bool __wrap_sdl3_monster_card_layout_compute(
 	}
 	return __real_sdl3_monster_card_layout_compute(layout, view_col, view_row,
 		view_cols, view_rows, cursor_col, cell_width, cell_height, big);
+}
+
+/*
+ * The sidebar keeps above the d-pad, so the thumb on it hides none of the
+ * hit points, stamina and the rest: with fewer rows than it has lines, the
+ * game leaves out its least important, as on a shorter screen
+ * (src/ui-display.c). The game's drawing is kept from when the presenter
+ * makes it; the controls say how far up the d-pad reaches.
+ */
+static const struct sdl3_visual *game_visual;
+static SDL_AtomicInt pad_height;
+
+void touch_set_pad_height(int height)
+{
+	SDL_SetAtomicInt(&pad_height, height > 0 ? height : 0);
+}
+
+/* The rows at the foot of the sidebar that reach below the pad's top by more
+ * than a quarter of a row, which its round top leaves clear. */
+static int sidebar_rows_under_pad(void)
+{
+	const struct sdl3_visual *v = game_visual;
+	int height = SDL_GetAtomicInt(&pad_height);
+	int last_clear;
+
+	if (!v || height <= 0 || v->cell_height <= 0 || v->rows < 3) return 0;
+	last_clear = (v->output_height - height + v->cell_height / 4 -
+		v->origin_y) / v->cell_height - 1;
+	return SDL_max(0, v->rows - 2 - SDL_max(0, last_clear));
+}
+
+bool __real_sdl3_visual_init(struct sdl3_visual *visual, SDL_Renderer *renderer,
+	const char *font_path, const char *map_font_path, int cols, int rows,
+	int map_zoom_percent);
+bool __wrap_sdl3_visual_init(struct sdl3_visual *visual, SDL_Renderer *renderer,
+	const char *font_path, const char *map_font_path, int cols, int rows,
+	int map_zoom_percent)
+{
+	if (!__real_sdl3_visual_init(visual, renderer, font_path, map_font_path,
+			cols, rows, map_zoom_percent)) {
+		return false;
+	}
+	game_visual = visual;
+	sidebar_covered_rows_hook = sidebar_rows_under_pad;
+	return true;
+}
+
+void __real_sdl3_visual_free(struct sdl3_visual *visual);
+void __wrap_sdl3_visual_free(struct sdl3_visual *visual)
+{
+	if (visual == game_visual) game_visual = NULL;
+	__real_sdl3_visual_free(visual);
 }
 
 /* The field guide, whose rail button closes it when it is open. */
@@ -1912,3 +1968,5 @@ TOUCH_CHECK_WRAP(do_cmd_help);
 TOUCH_CHECK_WRAP(textui_process_click);
 TOUCH_CHECK_WRAP(sdl3_presenter_point_to_cell);
 TOUCH_CHECK_WRAP(sdl3_monster_card_layout_compute);
+TOUCH_CHECK_WRAP(sdl3_visual_init);
+TOUCH_CHECK_WRAP(sdl3_visual_free);
