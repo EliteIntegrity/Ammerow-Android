@@ -263,6 +263,9 @@ void sdl3_frontend_change_selected_setting(struct sdl3_app *app, int delta)
 			app->missile_previous_valid = false;
 		}
 		break;
+	case SDL3_SETTINGS_EDGE_WARNINGS:
+		app->config.edge_warnings = !app->config.edge_warnings;
+		break;
 	case SDL3_SETTINGS_TERRAIN:
 		app->config.terrain_style = sdl3_terrain_style_change(
 			app->config.terrain_style, delta);

@@ -27,9 +27,9 @@ Menu, then Settings.  The pages are:
                           recent messages appear (top right unless you
                           choose Top or Bottom)
   Sound                   the master volume and each kind of sound
-  Display / Performance   map zoom, animated combat, and whether the
-                          weather is shown (it chooses itself; its
-                          sound is under Sound)
+  Display / Performance   map zoom, animated combat, the warning border
+                          (see below), and whether the weather is shown
+                          (it chooses itself; its sound is under Sound)
 
 Tap a setting to change it.  Each tap moves it on, and past the last
 choice it comes back round to the first, so a tap can always undo a
@@ -89,6 +89,28 @@ Poison
 While you are poisoned the statistics panel says so beside your hit
 points, as well as in messages and the status line.  It clears when the
 poison ends.
+
+Level, experience and gold
+--------------------------
+
+The statistics panel shows your level and the experience still needed in
+one line: L4 Next 27 means level 4, with 27 experience to go to level 5
+(L50 MAX at the top).  Yellow numbers mean drained levels or experience.
+Gold is the money you can spend.  A number too long for the panel uses k
+(thousand), M (million) or B (billion), experience rounded up and gold
+rounded down; Char shows the exact totals, and shops what you can spend.
+
+Warning border
+--------------
+
+A narrow coloured border round the screen warns of danger: red when your
+hit points are at or below a quarter, blue when at most a quarter of your
+air is left under water, yellow-orange when your stamina is at or below a
+fifth while swimming, or climbing or hanging without firm footing, and
+brown-orange when you are fainting or starving.  Only the most urgent
+shows, and it does not flash or pulse.  It is a reminder alongside the
+numbers and written statuses, not instead of them.  Settings, Display /
+Performance, Warning border turns it off.
 
 Learning and using magic
 ------------------------

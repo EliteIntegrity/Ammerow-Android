@@ -406,6 +406,7 @@ void sdl3_frontend_render(struct sdl3_app *app)
 	map_options.message_rows = app->dock_grid.rows;
 	map_options.big_stat_cards = app->config.big_stat_cards;
 	map_options.animated_combat = app->config.animated_combat;
+	map_options.edge_warnings = app->config.edge_warnings && !app->pause_menu.visible;
 	map_options.tile_mode = app->config.tile_mode;
 	map_options.zoom_percent = app->config.map_zoom_percent;
 	map_options.terrain_style = app->config.terrain_style;
@@ -446,6 +447,7 @@ void sdl3_frontend_render(struct sdl3_app *app)
 	frame.hud_stats_visible = app->config.hud_stats_visible;
 	frame.big_stat_cards = app->config.big_stat_cards;
 	frame.animated_combat = app->config.animated_combat;
+	frame.edge_warnings = app->config.edge_warnings;
 	frame.tile_mode = app->config.tile_mode;
 	frame.hybrid_tile_size = app->config.hybrid_tile_size;
 	frame.dock_placement = app->config.dock_placement;
@@ -1605,8 +1607,10 @@ bool sdl3_capture_settings(const char *action)
 			(void)sdl3_settings_activate(&g_app.settings);
 	} else if (streq(action, "close")) {
 		g_app.settings.visible = false;
-	} else if (streq(action, "map") || streq(action, "detail")) {
-		g_app.settings.selected_row = streq(action, "map") ?
+	} else if (streq(action, "map") || streq(action, "detail") ||
+			streq(action, "warnings")) {
+		g_app.settings.selected_row = streq(action, "warnings") ?
+			SDL3_SETTINGS_EDGE_WARNINGS : streq(action, "map") ?
 			SDL3_SETTINGS_TILE_MODE : SDL3_SETTINGS_HYBRID_DETAIL;
 		sdl3_frontend_change_selected_setting(&g_app, 1);
 	} else if (streq(action, "density") || streq(action, "font") ||

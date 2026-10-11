@@ -140,7 +140,7 @@ static int test_page_rows_are_shared_with_pointer_layout(void *state)
 	eq(row, SDL3_SETTINGS_HYBRID_DETAIL);
 	eq(sdl3_settings_page_row_count(SDL3_SETTINGS_INTERFACE), 7);
 	eq(sdl3_settings_page_row_count(SDL3_SETTINGS_SOUND), 9);
-	eq(sdl3_settings_page_row_count(SDL3_SETTINGS_DISPLAY), 4);
+	eq(sdl3_settings_page_row_count(SDL3_SETTINGS_DISPLAY), 5);
 	eq(sdl3_settings_page_row_count(SDL3_SETTINGS_HUB), 0);
 	require(sdl3_settings_page_row_at(SDL3_SETTINGS_INTERFACE, 2, &row));
 	eq(row, SDL3_SETTINGS_BIG_STAT_CARDS);
@@ -150,6 +150,8 @@ static int test_page_rows_are_shared_with_pointer_layout(void *state)
 	eq(row, SDL3_SETTINGS_ANIMATED_COMBAT);
 	require(sdl3_settings_page_row_at(SDL3_SETTINGS_DISPLAY, 3, &row));
 	eq(row, SDL3_SETTINGS_WEATHER);
+	require(sdl3_settings_page_row_at(SDL3_SETTINGS_DISPLAY, 4, &row));
+	eq(row, SDL3_SETTINGS_EDGE_WARNINGS);
 	ok;
 }
 

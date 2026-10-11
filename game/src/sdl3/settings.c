@@ -97,7 +97,7 @@ static void draw_page(const struct sdl3_settings_overlay *overlay,
 		enum sdl3_interface_density interface_density, int zoom_percent,
 		enum sdl3_terrain_style terrain_style,
 		enum sdl3_weather_mode weather_mode, bool fullscreen, bool dock_visible,
-		bool hud_stats_visible, bool big_stat_cards, bool animated_combat,
+		bool hud_stats_visible, bool big_stat_cards, bool animated_combat, bool edge_warnings,
 		bool tile_mode, int hybrid_tile_size,
 		enum sdl3_dock_placement dock_placement, int dock_rows, int dock_cols,
 		const struct sdl3_audio_settings *audio)
@@ -193,6 +193,9 @@ static void draw_page(const struct sdl3_settings_overlay *overlay,
 			animated_combat ? "Enabled" : "Disabled");
 		draw_setting_row(overlay, renderer, visual, theme, menu, SDL3_SETTINGS_WEATHER, "Visible weather",
 			weather_mode == SDL3_WEATHER_OFF ? "Off" : "On");
+		draw_setting_row(overlay, renderer, visual, theme, menu,
+			SDL3_SETTINGS_EDGE_WARNINGS, "Warning border",
+			edge_warnings ? "Subtle (static)" : "Off");
 		sdl3_ui_draw_text(visual,
 			"Map zoom affects only the play area; interface size is separate.",
 			left + 4, layout.note_row, width - 6, theme->muted);
@@ -213,7 +216,7 @@ void sdl3_settings_draw(const struct sdl3_settings_overlay *overlay,
 		int zoom_percent, enum sdl3_terrain_style terrain_style,
 		enum sdl3_weather_mode weather_mode, bool fullscreen,
 		bool dock_visible, bool hud_stats_visible, bool big_stat_cards,
-		bool animated_combat, bool tile_mode, int hybrid_tile_size,
+		bool animated_combat, bool edge_warnings, bool tile_mode, int hybrid_tile_size,
 		enum sdl3_dock_placement dock_placement, int dock_rows, int dock_cols,
 		const struct sdl3_audio_settings *audio)
 {
@@ -242,7 +245,7 @@ void sdl3_settings_draw(const struct sdl3_settings_overlay *overlay,
 		draw_page(overlay, renderer, visual, theme, left, width,
 			interface_font_name, map_font_name, interface_density,
 			zoom_percent, terrain_style, weather_mode, fullscreen, dock_visible,
-			hud_stats_visible, big_stat_cards, animated_combat, tile_mode, hybrid_tile_size,
+			hud_stats_visible, big_stat_cards, animated_combat, edge_warnings, tile_mode, hybrid_tile_size,
 			dock_placement,
 			dock_rows, dock_cols, audio);
 		sdl3_ui_draw_text(visual,

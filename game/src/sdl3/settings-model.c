@@ -46,7 +46,8 @@ static const enum sdl3_settings_row display_rows[] = {
 	SDL3_SETTINGS_FULLSCREEN,
 	SDL3_SETTINGS_ZOOM,
 	SDL3_SETTINGS_ANIMATED_COMBAT,
-	SDL3_SETTINGS_WEATHER
+	SDL3_SETTINGS_WEATHER,
+	SDL3_SETTINGS_EDGE_WARNINGS
 };
 
 static const enum sdl3_settings_row *page_rows(

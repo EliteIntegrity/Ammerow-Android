@@ -61,6 +61,7 @@ struct sdl3_presentation_frame {
 	bool hud_stats_visible;
 	bool big_stat_cards;
 	bool animated_combat;
+	bool edge_warnings;
 	bool tile_mode;
 	int hybrid_tile_size;
 	enum sdl3_dock_placement dock_placement;

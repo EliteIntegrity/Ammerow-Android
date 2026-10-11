@@ -1404,6 +1404,12 @@ bool headless_run_scenario(const struct headless_scenario *scenario,
 			Term_activate(angband_term[0]);
 			do_cmd_redraw();
 			Term_redraw_section(0, 0, Term->wid - 1, Term->hgt - 1);
+		} else if (streq(action, "inspect:low-health")) {
+			/* Deterministic presentation fixture; never compiled into releases. */
+			player->chp = (int16_t)MAX(1, player->mhp / 5);
+			player->chp_frac = 0;
+			player->upkeep->redraw |= PR_HP;
+			redraw_stuff(player);
 		} else if (prefix(action, "inspect:settings:")) {
 			if (!sdl3_capture_settings(action + strlen("inspect:settings:"))) {
 				runner_error(error, error_size, "unknown settings action", action);
