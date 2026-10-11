@@ -392,9 +392,10 @@ static int smallest_width_dp(void)
  *    desktop's Standard (120 x 36), whose text is too small to read there.
  *    An update moves only a phone still on Standard; Large would put the
  *    sidebar's health and stamina under the d-pad.
- * 3. new characters explore with the Explore button and walk to the nearest
- *    known staircase with Up and Down, as they always have on Android; the
- *    desktop leaves both off until chosen (default_game_options).
+ * 3. new characters explore with the Explore button until something needs
+ *    them (Explore mode Continuous) and walk to the nearest known staircase
+ *    with Up and Down; the desktop leaves both off until chosen
+ *    (default_game_options).
  * It edits the frontend's own settings file before the game reads it, so it
  * is the player's setting from then on, changed in Settings like any other.
  */
@@ -406,9 +407,10 @@ static int smallest_width_dp(void)
 /*
  * The game's saved defaults for new characters' interface options (written
  * by Settings, Controls & Convenience, Save gameplay defaults; read in
- * option.c), with the Android ones: Explore mode Traditional and Walk to
+ * option.c), with the Android ones: Explore mode Continuous and Walk to
  * stairs on. A file already there is the player's own and is kept. The
- * options it leaves out take the game's defaults.
+ * options it leaves out take the game's defaults. A character made before
+ * keeps its own (the game never moves one to Continuous by itself).
  */
 static void default_game_options(void)
 {
@@ -421,6 +423,7 @@ static void default_game_options(void)
 	if (!fp) return;
 	fputs("# Android defaults for new characters (Settings, Controls & Convenience).\n"
 		"option:autoexplore_commands:yes\n"
+		"option:autoexplore_continuous:yes\n"
 		"option:auto_stairs:yes\n", fp);
 	fclose(fp);
 }

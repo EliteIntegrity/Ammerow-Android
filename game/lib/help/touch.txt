@@ -45,8 +45,8 @@ The right-hand buttons
 
 On the map the large button does the obvious thing where you stand:
 
-  Explore   walk to the nearest spot you have not seen yet, when nothing
-            else applies; tap it again to go on
+  Explore   explore the level until something needs you, when nothing
+            else applies; a tap anywhere stops it
   Get       pick up what is here
   Down, Up  take the stairs
   Enter     go down into a cave mouth or hole
@@ -57,11 +57,11 @@ On the map the large button does the obvious thing where you stand:
 Around it are Rest (as long as needed), your ranged attack and Look (or
 Explore, when the large button is busy with something else).  On the
 surface, Travel (the known world) takes the ranged attack's place until
-something comes into view.  Explore stops when it gets there, or when
-something comes into view, and does not start with a monster in sight.
-Settings, Controls & Convenience can make it Continuous, exploring on
-until something needs you (a tap stops it), or turn it Off, when the
-large button is Wait.  To wait a turn, tap the centre of the d-pad.
+something comes into view.  Explore stops for a monster in view, new
+loot, an injury, hunger or other trouble, and does not start with a
+monster in sight.  Settings, Controls & Convenience can make it
+Traditional, one short walk a tap, or turn it Off, when the large button
+is Wait.  To wait a turn, tap the centre of the d-pad.
 
 When a monster comes into view, the large button becomes your ranged
 attack: Fire (with a launcher and ammunition for it), otherwise Use magic

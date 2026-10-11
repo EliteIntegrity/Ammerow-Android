@@ -68,12 +68,13 @@ Controls & Convenience
 
 Explore mode sets what the Explore button does:
 
-  Traditional   walk to the nearest spot you have not seen yet; press
-                Explore again to go on.  New characters start with this.
   Continuous    keep exploring the level until something needs you: a
                 monster in view, new loot, an injury or other condition,
                 low health, hunger or no light.  A tap anywhere, or any
-                button, stops it.
+                button, stops it.  New characters start with this; older
+                ones keep the mode they had.
+  Traditional   walk to the nearest spot you have not seen yet; press
+                Explore again to go on
   Off           no exploring; the large button offers Wait instead
 
 Exploring never fights for you, and leaves closed doors, known traps,

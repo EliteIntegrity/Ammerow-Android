@@ -292,8 +292,8 @@ data class Dpad(
 object ControlLayouts {
     private val ok = Command("OK", Action.Key(Keys.RETURN))
     private val back = Command("Back", Action.Key(Keys.ESCAPE))
-    // The game's auto-explore: each press walks to the nearest unexplored spot, or with
-    // Explore mode Continuous goes on until something needs the player (a tap stops it).
+    // The game's auto-explore: each press explores until something needs the player (a tap
+    // stops it), or with Explore mode Traditional walks to the nearest unexplored spot.
     // It does nothing with a monster in view, so the map's buttons offer it only when none is.
     private val explore = cmd("Explore", 'p')
     // Rest asks how long; Return takes the default, "as needed".
