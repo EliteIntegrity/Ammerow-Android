@@ -671,6 +671,7 @@ game/src/tests/sdl3/home-layout.c
 game/src/tests/sdl3/home-model.c
 game/src/tests/sdl3/input.c
 game/src/tests/sdl3/inspect-card.c
+game/src/tests/sdl3/item-details.c
 game/src/tests/sdl3/item-screen.c
 game/src/tests/sdl3/layout.c
 game/src/tests/sdl3/map-presenter.c

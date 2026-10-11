@@ -2294,6 +2294,11 @@ void sdl3_visual_render(struct sdl3_visual *visual, SDL_Renderer *renderer,
 	draw_foreground_overlays(visual, renderer, theme, map_view,
 		frame->inspect_card, frame->cursor_visible, frame->cursor_col,
 		frame->cursor_row);
+	sdl3_screen_draw(frame->screen_parent, renderer, visual, theme);
+	if (frame->screen_parent && frame->screen_parent->active &&
+			frame->screen_parent->kind == UI_SCREEN_STORE) {
+		draw_store_art(visual, renderer, theme, frame->store_art);
+	}
 	sdl3_screen_draw(frame->screen, renderer, visual, theme);
 	if (frame->screen && frame->screen->active &&
 			frame->screen->kind == UI_SCREEN_STORE) {

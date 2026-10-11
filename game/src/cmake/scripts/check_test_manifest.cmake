@@ -13,7 +13,8 @@ function(check_test_manifest source_root)
         message(FATAL_ERROR "Could not find ANGBAND_TEST_CASE_SOURCES")
     endif()
     # Compare registered suites, including optional literal append blocks.
-    # Their enablement is a build choice, not a portable-manifest mismatch.
+    # This parses declarations, not CMake conditionals: account below for the
+    # private suite that is deliberately absent from public source exports.
     string(REGEX MATCHALL "list\\(APPEND ANGBAND_TEST_CASE_SOURCES[^)]*\\)"
         _additional_source_blocks "${_cmake_text}")
     foreach(_block IN LISTS _additional_source_blocks)
@@ -27,9 +28,11 @@ function(check_test_manifest source_root)
         if(_source MATCHES "^sdl3/")
             continue()
         endif()
-        # A suite whose source is not in this tree (the private identity
-        # audit, which the published source leaves out) has no suite.mk here.
-        if(NOT EXISTS "${source_root}/src/tests/${_source}")
+        # Mirror the source-availability boundary in CMakeLists.txt.  When the
+        # private suite is present, check its portable registration even if
+        # AMMEROW_PRIVATE_AUDITS is OFF.  Do not ignore missing public suites.
+        if(_source STREQUAL "identity/terms.c" AND
+                NOT EXISTS "${source_root}/src/tests/identity/terms.c")
             continue()
         endif()
         string(REGEX REPLACE "\\.c$" "" _test "${_source}")

@@ -1,5 +1,13 @@
 # Ammerow release notes
 
+## Next update (unreleased)
+
+- Inspecting an item keeps inventory or equipment behind the details panel,
+  retaining the selected item when returning. Item details now show their
+  ASCII illustration, or a large coloured glyph when no illustration exists.
+  Unidentified items use only their unidentified appearance; long descriptions
+  scroll with arrows, Page Up/Down or the mouse wheel.
+
 ## 0.1.1 (unreleased)
 
 Interface and presentation fixes for the first update.
@@ -16,6 +24,7 @@ Interface and presentation fixes for the first update.
 - Long messages wrap correctly. Bottom messages stay left-aligned, and the
   sidebar fits above them instead of showing text underneath them. Inactive
   meters no longer leave unnecessary gaps; food remains visible on short panels.
+- The lean public source configures without requiring private audit tests.
 
 No gameplay balance, content or save-format changes are included. Existing
 0.1.0 saves and settings are intended to carry forward; keep a backup before

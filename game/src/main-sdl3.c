@@ -424,6 +424,7 @@ void sdl3_frontend_render(struct sdl3_app *app)
 	frame.pause_menu = &app->pause_menu;
 	frame.settings = &app->settings;
 	frame.screen = &app->screen;
+	frame.screen_parent = app->screen.modal ? &app->screen_parent : NULL;
 	frame.interface_font_name = info.interface_font_loaded ?
 		sdl3_font_filename(info.interface_font_path) : "";
 	frame.map_font_name = info.map_font_path[0] ?
@@ -623,10 +624,10 @@ static void term_screen_hook(const struct ui_screen *screen)
 		g_app.suppress_text_codepoint = 0;
 		event_signal(EVENT_INPUT_FLUSH);
 	}
-	sdl3_screen_capture(&g_app.screen, screen);
+	sdl3_screen_present(&g_app.screen, &g_app.screen_parent, screen);
 	sdl3_presentation_set_layer(&g_app.presentation,
 		SDL3_PRESENTATION_SEMANTIC_SCREEN,
-		screen && screen->kind != UI_SCREEN_NONE);
+		g_app.screen.active);
 	sdl3_grid_mark_dirty(&g_app.grid);
 }
 

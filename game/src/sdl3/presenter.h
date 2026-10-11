@@ -42,6 +42,7 @@ struct sdl3_presentation_frame {
 	const struct sdl3_pause_menu *pause_menu;
 	const struct sdl3_settings_overlay *settings;
 	const struct sdl3_screen *screen;
+	const struct sdl3_screen *screen_parent;
 	const char *interface_font_name;
 	const char *map_font_name;
 	enum sdl3_interface_density interface_density;

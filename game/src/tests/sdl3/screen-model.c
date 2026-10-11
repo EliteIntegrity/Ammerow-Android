@@ -626,6 +626,48 @@ static int test_action_menu_pointer_keys(void *state)
 	ok;
 }
 
+static int test_modal_retains_owned_parent(void *state)
+{
+	static struct sdl3_screen current, parent;
+	char name[] = "Inventory item";
+	struct ui_screen_row row = { .label = name, .enabled = true };
+	struct ui_screen base = { .kind = UI_SCREEN_ITEM_SELECTOR, .row_count = 1,
+		.rows = &row, .cursor = 0 };
+	struct ui_screen overlay = { .kind = UI_SCREEN_ITEM_ACTIONS, .modal = true };
+	(void)state;
+	sdl3_screen_present(&current, &parent, &base);
+	sdl3_screen_present(&current, &parent, &overlay);
+	name[0] = 'X';
+	require(parent.active && current.modal);
+	require(streq(parent.rows[0].label, "Inventory item"));
+	overlay.kind = UI_SCREEN_ITEM_DETAILS;
+	sdl3_screen_present(&current, &parent, &overlay);
+	eq(parent.kind, UI_SCREEN_ITEM_SELECTOR);
+	sdl3_screen_present(&current, &parent, NULL);
+	eq(current.kind, UI_SCREEN_ITEM_SELECTOR);
+	require(!current.modal && !parent.active);
+	require(streq(current.rows[0].label, "Inventory item"));
+	sdl3_screen_present(&current, &parent, NULL);
+	require(!current.active);
+	/* A map inspection has no semantic parent to restore. */
+	sdl3_screen_present(&current, &parent, &overlay);
+	require(!parent.active);
+	sdl3_screen_present(&current, &parent, NULL);
+	require(!current.active);
+	/* Shop inspection retains the shop, and a new full screen clears it. */
+	base.kind = UI_SCREEN_STORE;
+	sdl3_screen_present(&current, &parent, &base);
+	sdl3_screen_present(&current, &parent, &overlay);
+	sdl3_screen_present(&current, &parent, NULL);
+	eq(current.kind, UI_SCREEN_STORE);
+	sdl3_screen_present(&current, &parent, &overlay);
+	base.kind = UI_SCREEN_HELP;
+	sdl3_screen_present(&current, &parent, &base);
+	require(!parent.active);
+	eq(current.kind, UI_SCREEN_HELP);
+	ok;
+}
+
 const char *suite_name = "sdl3/screen-model";
 struct test tests[] = {
 	{ "capture is owned", test_capture_is_owned },
@@ -655,5 +697,6 @@ struct test tests[] = {
 		test_measure_store_columns_keep_price_gutter },
 	{ "measure character dossier", test_measure_character_dossier },
 	{ "action menu pointer keys", test_action_menu_pointer_keys },
+	{ "modal retains an owned parent", test_modal_retains_owned_parent },
 	{ NULL, NULL },
 };

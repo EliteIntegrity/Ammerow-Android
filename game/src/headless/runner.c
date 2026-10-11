@@ -14,6 +14,7 @@
 #include "cmd-spelunking.h"
 #include "effects.h"
 #include "game-world.h"
+#include "game-input.h"
 #include "generate.h"
 #include "headless/fall-bot.h"
 #include "headless/loop-bot.h"
@@ -41,6 +42,7 @@
 #include "ui-birth-screen.h"
 #include "ui-menu.h"
 #include "ui-options.h"
+#include "ui-object-screen.h"
 #include "ui-output.h"
 #include "ui-player.h"
 #include "ui-relic-broker.h"
@@ -129,6 +131,37 @@ static bool give_scenario_item(const char *definition, uint8_t quantity,
 				"could not equip scenario item", definition);
 		}
 	}
+	return true;
+}
+
+/* Use the same selector adapter and full-detail presenter as interactive
+ * inspection. This preview never changes item knowledge or executes actions. */
+static bool preview_item_details(const char *slot, bool equipment)
+{
+	struct ui_object_screen_item items[50] = { 0 };
+	struct menu menu = { 0 };
+	char *end;
+	long index = strtol(slot, &end, 10);
+	int count = MIN(equipment ? player->body.count : z_info->pack_size,
+		(int)N_ELEMENTS(items));
+	int previous_work = player->upkeep->command_wrk;
+	for (int i = 0; i < count; i++) {
+		items[i].object = equipment ? player->body.slots[i].obj :
+			player->upkeep->inven[i];
+		items[i].tag = all_letters_nohjkl[i];
+	}
+	if (!slot[0] || *end || index < 0 || index >= count ||
+			!items[index].object) return false;
+	while (count && !items[count - 1].object) count--;
+	menu.count = count;
+	menu.cursor = (int)index;
+	menu.active = (region){6, 8, MAX(1, Term->wid - 12), MAX(1, Term->hgt - 11)};
+	player->upkeep->command_wrk = equipment ? USE_EQUIP : USE_INVEN;
+	ui_object_screen_present(&menu, items, count, OLIST_WEIGHT,
+		USE_INVEN | USE_EQUIP | USE_QUIVER, false,
+		equipment ? "Equipment" : "Inventory", "Select an item");
+	player->upkeep->command_wrk = previous_work;
+	ui_item_details_present(items[index].object, 0);
 	return true;
 }
 
@@ -1362,7 +1395,11 @@ bool headless_run_scenario(const struct headless_scenario *scenario,
 		(void)sdl3_capture_introduction(NULL);
 		sdl3_capture_clear_inspection();
 		(void)sdl3_capture_store(NULL);
-		if (Term && Term->screen_hook) Term->screen_hook(NULL);
+		if (Term && Term->screen_hook) {
+			/* Dismiss a modal and then its retained parent before a new action. */
+			Term->screen_hook(NULL);
+			Term->screen_hook(NULL);
+		}
 		if (streq(action, "inspect:refresh")) {
 			Term_activate(angband_term[0]);
 			do_cmd_redraw();
@@ -1464,6 +1501,16 @@ bool headless_run_scenario(const struct headless_scenario *scenario,
 					ui_relic_broker_present(&stores[store_index], 0, 0);
 					break;
 				}
+			}
+		} else if (prefix(action, "inspect:item:")) {
+			if (!preview_item_details(action + strlen("inspect:item:"), false)) {
+				runner_error(error, error_size, "invalid inventory inspection slot", action);
+				goto cleanup;
+			}
+		} else if (prefix(action, "inspect:equipment:")) {
+			if (!preview_item_details(action + strlen("inspect:equipment:"), true)) {
+				runner_error(error, error_size, "invalid equipment inspection slot", action);
+				goto cleanup;
 			}
 		} else if (streq(action, "inspect:closest-monster")) {
 			if (!sdl3_capture_inspect_closest_monster()) {

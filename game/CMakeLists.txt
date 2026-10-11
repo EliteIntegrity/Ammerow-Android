@@ -1242,6 +1242,7 @@ set(ANGBAND_TEST_CASE_SOURCES
       sdl3/input.c
       sdl3/inspect-card.c
       sdl3/item-screen.c
+      sdl3/item-details.c
       sdl3/layout.c
       sdl3/map-presenter.c
     sdl3/monster-art.c
@@ -1462,7 +1463,8 @@ foreach(ANGBAND_TEST_CASE_SOURCE ${ANGBAND_TEST_CASE_SOURCES})
               src/sdl3/monster-card-data.c
               src/sdl3/ascii-art.c
           )
-      elseif(ANGBAND_TEST_CASE_SOURCE STREQUAL "sdl3/item-screen.c")
+      elseif(ANGBAND_TEST_CASE_SOURCE STREQUAL "sdl3/item-screen.c" OR
+          ANGBAND_TEST_CASE_SOURCE STREQUAL "sdl3/item-details.c")
           list(APPEND ANGBAND_TEST_CASE_EXTRA_SOURCES
               src/sdl3/screen-model.c
           )

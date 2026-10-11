@@ -50,6 +50,7 @@
 #include "ui-menu.h"
 #include "ui-mon-lore.h"
 #include "ui-object.h"
+#include "ui-object-screen.h"
 #include "ui-player.h"
 #include "ui-spell.h"
 #include "ui-store.h"
@@ -739,7 +740,6 @@ int context_menu_object(struct object *obj)
 	struct context_menu_object_action actions[CONTEXT_MENU_OBJECT_ACTIONS_MAX];
 	int count, i;
 
-	textblock *tb;
 	region area = { 0, 0, 0, 0 };
 
 	bool allowed = true;
@@ -771,24 +771,36 @@ int context_menu_object(struct object *obj)
 	r.page_rows = m->count;
 
 	area.width = -(r.width + 2);
+	if (Term->screen_hook) {
+		r.width = MIN(58, MAX(12, Term->wid - 16));
+		/* menu_layout reserves two rows and four columns for m->title. */
+		r.col = MAX(0, (Term->wid - r.width) / 2 - 4);
+		r.row = 7;
+		r.page_rows = MIN(m->count, MAX(1, Term->hgt - 14)) + 2;
+		m->title = header;
+		m->present_hook = ui_object_actions_present;
+	}
 
 	/* No flush needed */
 	msg_flag = false;
 	screen_save();
 
 	/* Display info */
-	tb = object_info(obj, OINFO_NONE);
 	object_desc(header, sizeof(header), obj, ODESC_PREFIX | ODESC_FULL,
 		player);
 
-	textui_textblock_place(tb, area, format("%s", header));
-	textblock_free(tb);
+	if (!Term->screen_hook) {
+		textblock *tb = object_info(obj, OINFO_NONE);
+		textui_textblock_place(tb, area, header);
+		textblock_free(tb);
+	}
 
 	menu_layout(m, &r);
 	region_erase_bordered(&r);
 
 	prt(format("(Enter to select, ESC) Command for %s:", header), 0, 0);
 	selected = menu_dynamic_select(m);
+	if (Term->screen_hook) Term->screen_hook(NULL);
 
 	menu_dynamic_free(m);
 	string_free(labels);
@@ -803,14 +815,7 @@ int context_menu_object(struct object *obj)
 			return 3;
 
 		case MENU_VALUE_INSPECT:
-			/* copied from textui_obj_examine */
-			/* Display info */
-			tb = object_info(obj, OINFO_NONE);
-			object_desc(header, sizeof(header), obj,
-				ODESC_PREFIX | ODESC_FULL, player);
-
-			textui_textblock_show(tb, area, format("%s", header));
-			textblock_free(tb);
+			ui_item_details_show(obj);
 			return 2;
 
 		case MENU_VALUE_DROP_ALL:
@@ -845,6 +850,9 @@ int context_menu_object(struct object *obj)
 		case CMD_FIRE:
 		case CMD_USE:
 			/* Check for inscriptions that trigger confirmation. */
+			/* Non-inspection prompts may use the terminal; do not hide them
+			 * behind a retained semantic selector. */
+			if (Term->screen_hook) Term->screen_hook(NULL);
 			allowed = key_confirm_command(cmdkey) &&
 				get_item_allow(obj, cmdkey, selected, false);
 			break;

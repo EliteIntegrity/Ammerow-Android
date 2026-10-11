@@ -210,13 +210,16 @@ static int item_menu_depth;
 static cmd_code item_cmd;
 static const struct object *item_focus;
 
-/* True while an item list is open just to browse it, with nothing over it.
+/* True while an item list is open just to browse it, with nothing over it
+ * (the game shows an item's actions and details as panels over the list).
  * After death the only list is the death screen's Examine items, which picks
  * an item only to describe it: no actions apply. */
 static bool browsing_items(void)
 {
 	return item_depth > 0 && item_cmd == CMD_NULL &&
-		menu_depth == item_menu_depth && view_depth == 0 && player &&
+		menu_depth == item_menu_depth && view_depth == 0 &&
+		shown_screen != UI_SCREEN_ITEM_ACTIONS &&
+		shown_screen != UI_SCREEN_ITEM_DETAILS && player &&
 		!player->is_dead && !player_is_shapechanged(player);
 }
 
@@ -410,6 +413,11 @@ static bool prompt_context(int *mode, int *detail)
 	if (shown_screen == UI_SCREEN_STORY) {
 		*mode = MODE_PROMPT;
 		*detail = PROMPT_STORY;
+	} else if (shown_screen == UI_SCREEN_ITEM_DETAILS ||
+			shown_screen == UI_SCREEN_ITEM_ACTIONS) {
+		/* An item's details or actions, as a panel over whatever opened them
+		 * (an item list, a shop, looking at the floor): OK, Back and paging. */
+		*mode = MODE_PROMPT;
 	} else if (msg_flag && more_prompt_showing()) {
 		*mode = MODE_MORE;
 	} else if (name_depth > 0) {
@@ -964,11 +972,21 @@ const char *touch_block_text(const char *text, char *buffer, size_t size);
  * the screen on show is known (options, the dossier, the run summary). */
 static void (*frontend_screen_hook)(const struct ui_screen *screen);
 
+/* Set while a button's action answers an item's menu unseen (see
+ * __wrap_context_menu_object): the game then dismisses the actions panel it
+ * would have shown, and with none shown that would close the item list
+ * behind it, so the details of Inspect would show over the map. */
+static bool item_menu_unseen;
+
 static void touch_screen_hook(const struct ui_screen *screen)
 {
 	static char context[4096];
 	const char *text;
 
+	if (!screen && item_menu_unseen) {
+		item_menu_unseen = false;
+		return;
+	}
 	shown_screen = screen ? screen->kind : UI_SCREEN_NONE;
 	dossier_shown = screen && screen->kind == UI_SCREEN_CHARACTER_DOSSIER &&
 		!(screen->help && strstr(screen->help, "Press any key"));
@@ -1870,8 +1888,10 @@ void __wrap_ui_object_screen_present(struct menu *menu,
 {
 	item_focus = menu && items && menu->cursor >= 0 &&
 		menu->cursor < item_count ? items[menu->cursor].object : NULL;
-	/* Drawn again before Enter reached the item's menu: drop the action. */
-	pending_verb = NO_VERB;
+	/* Drawn again inside its menu before Enter reached the item's menu: drop
+	 * the action. (Between choosing the item and opening its menu, the game
+	 * redraws the list outside its menu: the action stands.) */
+	if (menu_depth == item_menu_depth) pending_verb = NO_VERB;
 	if (restore_cursor) {
 		int i = 0;
 
@@ -1905,7 +1925,9 @@ int __wrap_context_menu_object(struct object *obj)
 	chosen = pending_verb != NO_VERB && obj == pending_verb_item;
 	if (!chosen) pending_verb = NO_VERB;
 	answer_item_menu = chosen;
+	item_menu_unseen = chosen && Term && Term->screen_hook;
 	result = __real_context_menu_object(obj);
+	item_menu_unseen = false;
 	answer_item_menu = false;
 	pending_verb = NO_VERB;
 	/* 2: shown and finished (Inspect, Browse); the game would reopen the menu. */

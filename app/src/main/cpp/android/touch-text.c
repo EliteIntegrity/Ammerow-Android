@@ -122,6 +122,10 @@ static const struct rewrite lines[] = {
 	{ "Enter actions   D stashes   L examines   ? help   Escape leaves",
 		"Tap an item, then Take or Examine   Stash stores your own   Back leaves" },
 	{ "Enter examines   Escape returns", "Tap an item to examine it   Back returns" },
+	/* An item's actions and details, as panels over the list it came from */
+	{ "Arrows select   Enter chooses   Escape returns",
+		"Tap an action, or the d-pad and OK   Back returns" },
+	{ "Enter / Escape / Click to return", "OK, Back or a tap returns" },
 	{ "Press '?' for help.", "" },
 	{ "(Press any key to continue.)", "(Tap or OK to continue.)" },
 	{ "[Press any key to continue]", "[Tap or OK to continue]" },
@@ -180,6 +184,8 @@ static const struct rewrite lines[] = {
 
 /* Phrases within footer hints, applied in order, every occurrence. */
 static const struct rewrite phrases[] = {
+	/* A long item description's hint, which ends with the lines shown. */
+	{ "Enter/Esc/Click returns", "OK, Back or a tap returns" },
 	{ "(ESC to cancel, Enter to select)", "(tap or OK selects, Back cancels)" },
 	{ "(Esc to cancel, Enter to select)", "(tap or OK selects, Back cancels)" },
 	{ "(Enter to select command, ESC to cancel)", "(OK selects, Back cancels)" },

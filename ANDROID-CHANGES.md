@@ -1,7 +1,8 @@
 # Android changes to the game
 
 `game/` is the game's own source, as published for the desktop edition
-(version 0.1.1), with the changes below made for Android in 2026 by John
+(version 0.1.1, with its next update's fix that keeps an item list behind
+the item's details), with the changes below made for Android in 2026 by John
 Horton. Everything else in `game/` is unchanged.
 
 | Change | Files in `game/` |
@@ -18,5 +19,4 @@ Horton. Everything else in `game/` is unchanged.
 | Touch versions of field guide pages (new `lib/help/touch.txt`), listed in the release manifest. | `lib/help/index.txt`, `interface.txt`, `world.txt`, `fishing.txt`, `spelunking.txt`, `packaging/runtime.txt` |
 | The legal screen describes the Android edition. | `lib/screens/legal.txt` |
 | The field guide's test opens the keyboard commands from the Android index, where they are (g). | `src/tests/sdl3/help-screen.c` |
-| The unit-test list check skips suites whose source is not in the tree (the desktop's private identity audit, which the published source leaves out), so this tree configures. | `src/cmake/scripts/check_test_manifest.cmake` |
 | The Android build's source lists, and this folder's guide (both new). | `sources.cmake`, `README.md` |

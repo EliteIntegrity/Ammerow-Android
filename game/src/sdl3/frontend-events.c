@@ -237,6 +237,7 @@ static bool handle_semantic_selection_pointer(struct sdl3_app *app,
 			app->screen.kind != UI_SCREEN_CHARACTER_DOSSIER &&
 			app->screen.kind != UI_SCREEN_BIRTH_STATS &&
 			app->screen.kind != UI_SCREEN_ACTION_MENU &&
+			app->screen.kind != UI_SCREEN_ITEM_ACTIONS &&
 			app->screen.kind != UI_SCREEN_OPTIONS && !list_screen) {
 		return false;
 	}
@@ -252,7 +253,8 @@ static bool handle_semantic_selection_pointer(struct sdl3_app *app,
 	}
 	row = &app->screen.rows[index];
 	if (!row->enabled) return true;
-	if (app->screen.kind == UI_SCREEN_ACTION_MENU) {
+	if (app->screen.kind == UI_SCREEN_ACTION_MENU ||
+			app->screen.kind == UI_SCREEN_ITEM_ACTIONS) {
 		keycode_t keys[SDL3_SCREEN_ROW_CAPACITY];
 		int count = sdl3_screen_action_menu_keys(&app->screen, index,
 			activate, keys, N_ELEMENTS(keys));
@@ -746,6 +748,12 @@ bool sdl3_frontend_dispatch_event(struct sdl3_app *app,
 			}
 			if (wheel_y == 0.0f) return false;
 			direction = wheel_y > 0.0f ? 1 : -1;
+			if (app->screen.active && app->screen.kind == UI_SCREEN_ITEM_DETAILS &&
+					!app->settings.visible && !app->pause_menu.visible) {
+				for (int i = 0; i < 3; i++)
+					Term_keypress(direction > 0 ? ARROW_UP : ARROW_DOWN, 0);
+				return true;
+			}
 			if (app->home.visible && app->home.page == SDL3_HOME_WORLD_PAGE &&
 					!app->settings.visible && !app->pause_menu.visible) {
 				struct ui_world_intro_layout layout;
