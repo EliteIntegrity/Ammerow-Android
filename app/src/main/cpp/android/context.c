@@ -796,8 +796,11 @@ static void publish_context(void)
 	if (!SDL_IsMainThread()) return;
 	current_context(&mode, &primary, &flags, &detail);
 	/* While browsing items or a shop's stock, a tap on a row only highlights
-	 * it (src/sdl3/frontend-events.c); the buttons then act on it. */
-	sdl3_host_list_tap_highlights = mode == MODE_ITEMS || mode == MODE_STORE;
+	 * it (src/sdl3/frontend-events.c); the buttons then act on it. So does a
+	 * tap on a level's reward, which a tap meant for the map as the card
+	 * opens would otherwise spend: a second tap, or OK, takes it. */
+	sdl3_host_list_tap_highlights = mode == MODE_ITEMS || mode == MODE_STORE ||
+		shown_screen == UI_SCREEN_ADVANCEMENT;
 	describe_verbs(verbs, sizeof(verbs), mode, detail);
 	context_changed = mode != last_mode || primary != last_primary ||
 		flags != last_flags || detail != last_detail;

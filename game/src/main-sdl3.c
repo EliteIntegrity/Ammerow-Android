@@ -621,7 +621,8 @@ static bool run_font_memory_stress(struct sdl3_app *app)
 static void term_screen_hook(const struct ui_screen *screen)
 {
 	if (screen && (screen->kind == UI_SCREEN_RUN_SUMMARY ||
-			screen->kind == UI_SCREEN_STORY) && g_app.screen.kind != screen->kind) {
+			screen->kind == UI_SCREEN_STORY || screen->kind == UI_SCREEN_ADVANCEMENT) &&
+			g_app.screen.kind != screen->kind) {
 		/* Flush queued commands AND fence future OS repeats.  Repainting the
 		 * same card must not re-arm; entering a new modal card should. */
 		sdl3_input_gate_arm(&g_app.input_gate);

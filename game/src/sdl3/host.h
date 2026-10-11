@@ -33,9 +33,9 @@ enum sdl3_host_zoom_phase {
 
 /**
  * Set by a host while a list is open for browsing (an item list rather than
- * one picking an item for a command, or a shop's stock): a click on a row
- * then only highlights it (the host offers that row's actions), and a click
- * on the highlighted row accepts it.
+ * one picking an item for a command, or a shop's stock), or while a level's
+ * rewards are offered: a click on a row then only highlights it (the host
+ * offers that row's actions), and a click on the highlighted row accepts it.
  */
 extern bool sdl3_host_list_tap_highlights;
 

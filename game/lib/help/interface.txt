@@ -135,6 +135,21 @@ Gold is the money you can spend.  A number too long for the panel uses k
 (thousand), M (million) or B (billion), experience rounded up and gold
 rounded down; Char shows the exact totals, and shops what you can spend.
 
+Level-up cards and rewards
+--------------------------
+
+Each new highest level brings a card once the current action is over.
+Levels 5, 10, 15 and so on up to 50 also offer one choice of supplies: a
+bundle of potions, a bundle of scrolls, or gold (never lasting bonuses).
+Tap a reward to highlight it, then tap it again or press OK to take it;
+the first tap only highlights, so a tap meant for the map cannot spend
+it.  Choose later, or Back, keeps it for More, Commands, Information,
+Level rewards.  A full pack never loses a reward: make room for the whole
+bundle, take the gold, or come back later.  Each milestone is claimed
+once, and losing and regaining levels does not repeat cards or rewards.
+A character made before rewards existed earns them only above the
+highest level it had reached.
+
 Warning border
 --------------
 

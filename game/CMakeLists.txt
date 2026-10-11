@@ -410,6 +410,7 @@ add_library(OurCoreLib OBJECT
         src/player-history.c
         src/player-path.c
         src/player-explore.c
+        src/player-advancement.c
         src/player-properties.c
 		src/player-resource.c
         src/player-quest.c
@@ -484,6 +485,7 @@ add_library(OurCoreLib OBJECT
         src/ui-store-screen.c
         src/ui-relic-broker.c
 		src/ui-story.c
+		src/ui-advancement.c
         src/ui-target.c
         src/ui-term.c
         src/ui-travel.c
@@ -1127,6 +1129,7 @@ set(ANGBAND_TEST_CASE_SOURCES
     effects/destruction.c
     effects/earthquake.c
     effects/info.c
+    game/advancement.c
     game/basic.c
     game/explore.c
 	game/fishing.c

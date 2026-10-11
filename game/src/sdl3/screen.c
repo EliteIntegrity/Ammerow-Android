@@ -445,6 +445,21 @@ void sdl3_screen_draw(const struct sdl3_screen *screen,
 			layout.width, theme->muted);
 		return;
 	}
+	if (screen->kind == UI_SCREEN_ADVANCEMENT) {
+		int top = screen->content_row - 8;
+		int height = screen->content_rows + 14;
+		sdl3_ui_draw_panel(renderer, visual, theme, layout.left - 2, top,
+			layout.width + 4, height, false);
+		sdl3_ui_draw_text(visual, screen->title, layout.left, top + 2, layout.width, theme->title);
+		draw_text_ellipsized(visual, screen->subtitle, layout.left, top + 4, layout.width, theme->text);
+		sdl3_ui_draw_text(visual, screen->context, layout.left, top + 6, layout.width, theme->accent);
+		layout.detail_width = 0;
+		layout.label_width = MAX(1, layout.width - 8);
+		draw_rows(screen, renderer, visual, theme, &layout);
+		sdl3_ui_draw_text(visual, screen->help, layout.left, top + height - 2,
+			layout.width, theme->muted);
+		return;
+	}
 	sdl3_ui_draw_text(visual, screen->title, layout.left, 2, layout.width,
 		theme->title);
 	sdl3_ui_draw_text(visual, screen->subtitle, layout.left, 4, layout.width,

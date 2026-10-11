@@ -83,6 +83,14 @@ static const struct rewrite lines[] = {
 	 * placed by its length */
 	{ "Exploring... any key or click stops. Combat remains manual.",
 		"Exploring... any tap or button stops. Combat stays manual." },
+	/* The level-up card: a first tap on a reward only highlights it
+	 * (publish_context in android/context.c); Level rewards is in the game's
+	 * command menu, which is More, Commands. */
+	{ "Arrows choose   Enter confirms   Escape chooses later",
+		"Tap a reward twice, or the d-pad and OK   Back chooses later" },
+	{ "Enter / Space / Escape or click Continue", "OK, Back or a tap on Continue" },
+	{ "Choose one. Deferred rewards: Enter > Information > Level rewards.",
+		"Choose one. Later: More > Commands > Information > Level rewards." },
 
 	/* Prompts */
 	{ "Direction ('*' or <click> to target, \"'\" for closest, Escape to cancel)? ",

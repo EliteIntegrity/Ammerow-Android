@@ -626,6 +626,35 @@ static int test_action_menu_pointer_keys(void *state)
 	ok;
 }
 
+static int test_advancement_pointer_and_layout(void *state)
+{
+	struct sdl3_screen screen = { 0 };
+	struct sdl3_screen_layout layout;
+	keycode_t keys[8];
+	(void)state;
+	screen.active = screen.modal = true;
+	screen.kind = UI_SCREEN_ADVANCEMENT;
+	screen.row_count = screen.content_rows = 4;
+	screen.cursor = 3;
+	screen.content_col = 6;
+	screen.content_row = 10;
+	screen.content_cols = 68;
+	my_strcpy(screen.context, "Choose one reward.", sizeof(screen.context));
+	for (int i = 0; i < 4; i++) screen.rows[i].enabled = true;
+	require(sdl3_screen_measure(&screen, 80, 24, &layout));
+	eq(layout.context_width, 0); /* Instruction stays above, not beside rows. */
+	eq(layout.visible_rows, 4);
+	eq(sdl3_screen_action_menu_keys(&screen, 0, true, keys, 8), 4);
+	eq(keys[0], ARROW_UP);
+	eq(keys[1], ARROW_UP);
+	eq(keys[2], ARROW_UP);
+	eq(keys[3], KC_ENTER);
+	eq(sdl3_screen_action_menu_keys(&screen, 3, true, keys, 8), 1);
+	eq(keys[0], KC_ENTER);
+	eq(sdl3_screen_action_menu_keys(&screen, -1, true, keys, 8), 0);
+	ok;
+}
+
 static int test_modal_retains_owned_parent(void *state)
 {
 	static struct sdl3_screen current, parent;
@@ -697,6 +726,7 @@ struct test tests[] = {
 		test_measure_store_columns_keep_price_gutter },
 	{ "measure character dossier", test_measure_character_dossier },
 	{ "action menu pointer keys", test_action_menu_pointer_keys },
+	{ "advancement pointer and layout", test_advancement_pointer_and_layout },
 	{ "modal retains an owned parent", test_modal_retains_owned_parent },
 	{ NULL, NULL },
 };

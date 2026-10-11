@@ -371,6 +371,8 @@ game/src/option.c
 game/src/option.h
 game/src/parser.c
 game/src/parser.h
+game/src/player-advancement.c
+game/src/player-advancement.h
 game/src/player-attack.c
 game/src/player-attack.h
 game/src/player-birth.c
@@ -555,6 +557,7 @@ game/src/tests/effects/destruction.c
 game/src/tests/effects/earthquake.c
 game/src/tests/effects/info.c
 game/src/tests/effects/suite.mk
+game/src/tests/game/advancement.c
 game/src/tests/game/basic.c
 game/src/tests/game/explore.c
 game/src/tests/game/fishing.c
@@ -736,6 +739,8 @@ game/src/tests/z-virt/string.c
 game/src/tests/z-virt/suite.mk
 game/src/trap.c
 game/src/trap.h
+game/src/ui-advancement.c
+game/src/ui-advancement.h
 game/src/ui-birth-screen.c
 game/src/ui-birth-screen.h
 game/src/ui-birth.c
@@ -1019,6 +1024,8 @@ game/tests/headless/scenarios/camera-west-edge.scn
 game/tests/headless/scenarios/cave-fatal-fall.scn
 game/tests/headless/scenarios/cave-larder-loop.scn
 game/tests/headless/scenarios/hud-bottom-large.scn
+game/tests/headless/scenarios/level-rewards-large.scn
+game/tests/headless/scenarios/level-rewards.scn
 game/tests/headless/scenarios/settings-large.scn
 game/tests/headless/scenarios/smoke.scn
 game/tests/run-test

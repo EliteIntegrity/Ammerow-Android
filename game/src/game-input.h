@@ -1,3 +1,8 @@
+/*
+ * Ammerow modifications Copyright (c) 2026 John Horton
+ * SPDX-License-Identifier: GPL-2.0-only
+ */
+
 /**
  * \file game-input.h
  * \brief Ask for non-command input from the UI.

@@ -240,6 +240,7 @@ static bool handle_semantic_selection_pointer(struct sdl3_app *app,
 			app->screen.kind != UI_SCREEN_BIRTH_STATS &&
 			app->screen.kind != UI_SCREEN_ACTION_MENU &&
 			app->screen.kind != UI_SCREEN_ITEM_ACTIONS &&
+			app->screen.kind != UI_SCREEN_ADVANCEMENT &&
 			app->screen.kind != UI_SCREEN_OPTIONS && !list_screen) {
 		return false;
 	}
@@ -256,10 +257,16 @@ static bool handle_semantic_selection_pointer(struct sdl3_app *app,
 	row = &app->screen.rows[index];
 	if (!row->enabled) return true;
 	if (app->screen.kind == UI_SCREEN_ACTION_MENU ||
-			app->screen.kind == UI_SCREEN_ITEM_ACTIONS) {
+			app->screen.kind == UI_SCREEN_ITEM_ACTIONS ||
+			app->screen.kind == UI_SCREEN_ADVANCEMENT) {
 		keycode_t keys[SDL3_SCREEN_ROW_CAPACITY];
+		/* For a host, a first click on a level reward only highlights it: a
+		 * tap meant for the map as the card opens must not spend the reward. */
+		bool accept = activate && (index == app->screen.cursor ||
+			app->screen.kind != UI_SCREEN_ADVANCEMENT ||
+			!sdl3_host_list_tap_highlights);
 		int count = sdl3_screen_action_menu_keys(&app->screen, index,
-			activate, keys, N_ELEMENTS(keys));
+			accept, keys, N_ELEMENTS(keys));
 		for (int i = 0; i < count; i++) Term_keypress(keys[i], 0);
 		return true;
 	}

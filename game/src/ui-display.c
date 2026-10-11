@@ -62,6 +62,7 @@
 #include "ui-prefs.h"
 #include "ui-store.h"
 #include "ui-story.h"
+#include "ui-advancement.h"
 #include "ui-fishing.h"
 #include "ui-spelunking.h"
 #include "ui-term.h"
@@ -3081,6 +3082,7 @@ static void ui_enter_world(game_event_type type, game_event_data *data,
 
 	/* Present narrative without coupling the world model to a frontend. */
 	event_add_handler(EVENT_STORY, ui_story_event, NULL);
+	event_add_handler(EVENT_ADVANCEMENT, ui_advancement_event, NULL);
 
 	/* Decrease "icky" depth */
 	screen_save_depth--;
@@ -3146,6 +3148,7 @@ static void ui_leave_world(game_event_type type, game_event_data *data,
 
 	/* Stop receiving narrative while the game view is inactive. */
 	event_remove_handler(EVENT_STORY, ui_story_event, NULL);
+	event_remove_handler(EVENT_ADVANCEMENT, ui_advancement_event, NULL);
 
 	/* Prepare to interact with a store */
 	event_add_handler(EVENT_USE_STORE, use_store, NULL);

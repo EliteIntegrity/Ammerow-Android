@@ -37,6 +37,7 @@
 #include "project.h"
 #include "store.h"
 #include "ui-command.h"
+#include "ui-advancement.h"
 #include "ui-help.h"
 #include "ui-context.h"
 #include "ui-birth-screen.h"
@@ -1410,6 +1411,18 @@ bool headless_run_scenario(const struct headless_scenario *scenario,
 			player->chp_frac = 0;
 			player->upkeep->redraw |= PR_HP;
 			redraw_stuff(player);
+		} else if (streq(action, "inspect:level-card") ||
+				streq(action, "inspect:level-reward") ||
+				streq(action, "inspect:level-reward-full")) {
+			/* Read-only preview using the production card, not an XP cheat. */
+			struct player_advancement saved = player->advancement;
+			bool reward = !streq(action, "inspect:level-card");
+			Term_activate(angband_term[0]);
+			player->advancement.rewards = reward ? 1 : 0;
+			ui_advancement_present(reward ? 5 : 2, reward ? 3 : 0,
+				streq(action, "inspect:level-reward-full") ?
+				"No room for the full reward. Choose gold or come back later." : NULL);
+			player->advancement = saved;
 		} else if (prefix(action, "inspect:settings:")) {
 			if (!sdl3_capture_settings(action + strlen("inspect:settings:"))) {
 				runner_error(error, error_size, "unknown settings action", action);

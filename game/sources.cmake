@@ -147,6 +147,7 @@ set(AMMEROW_CORE_SOURCES
     src/player-history.c
     src/player-path.c
     src/player-explore.c
+    src/player-advancement.c
     src/player-properties.c
     src/player-resource.c
     src/player-quest.c
@@ -221,6 +222,7 @@ set(AMMEROW_CORE_SOURCES
     src/ui-store-screen.c
     src/ui-relic-broker.c
     src/ui-story.c
+    src/ui-advancement.c
     src/ui-target.c
     src/ui-term.c
     src/ui-travel.c
