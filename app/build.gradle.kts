@@ -48,7 +48,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "0.1.1-android.2"
+        versionName = "0.1.2-android.1"
 
         ndk {
             // -Pammerow.abis=x86_64 builds only what the emulator needs.
