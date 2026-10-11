@@ -325,6 +325,7 @@ ANGFILES0 = \
 	player-class.o \
 	player-history.o \
 	player-path.o \
+	player-explore.o \
 	player-properties.o \
 	player-resource.o \
 	player-quest.o \

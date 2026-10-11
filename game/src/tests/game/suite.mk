@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 
 TESTPROGS += game/basic \
+	game/explore \
 	game/fishing \
 	game/larder \
 	game/mage \

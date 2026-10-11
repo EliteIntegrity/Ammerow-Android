@@ -424,6 +424,8 @@ void sdl3_frontend_render(struct sdl3_app *app)
 	frame.home = &app->home;
 	frame.pause_menu = &app->pause_menu;
 	frame.settings = &app->settings;
+	frame.game_options = player ? &player->opts : NULL;
+	frame.playing = character_dungeon && player && !player->is_dead;
 	frame.screen = &app->screen;
 	frame.screen_parent = app->screen.modal ? &app->screen_parent : NULL;
 	frame.interface_font_name = info.interface_font_loaded ?
@@ -1597,16 +1599,21 @@ bool sdl3_capture_settings(const char *action)
 	if (!g_app.offscreen || !action) return false;
 	if (streq(action, "open") || streq(action, "interface") ||
 			streq(action, "sound") || streq(action, "display") ||
-			streq(action, "hub")) {
+			streq(action, "hub") || streq(action, "controls")) {
 		sdl3_settings_open(&g_app.settings);
 		g_app.settings.selected_hub_row = streq(action, "interface") ?
 			SDL3_SETTINGS_HUB_INTERFACE : streq(action, "sound") ?
 			SDL3_SETTINGS_HUB_SOUND : streq(action, "display") ?
-			SDL3_SETTINGS_HUB_DISPLAY : SDL3_SETTINGS_HUB_APPEARANCE;
+			SDL3_SETTINGS_HUB_DISPLAY : streq(action, "controls") ?
+			SDL3_SETTINGS_HUB_CONTROLS : SDL3_SETTINGS_HUB_APPEARANCE;
 		if (!streq(action, "hub"))
 			(void)sdl3_settings_activate(&g_app.settings);
 	} else if (streq(action, "close")) {
 		g_app.settings.visible = false;
+	} else if (streq(action, "explore") || streq(action, "stairs")) {
+		g_app.settings.selected_row = streq(action, "explore") ?
+			SDL3_SETTINGS_EXPLORE : SDL3_SETTINGS_AUTO_STAIRS;
+		sdl3_frontend_change_selected_setting(&g_app, 1);
 	} else if (streq(action, "map") || streq(action, "detail") ||
 			streq(action, "warnings")) {
 		g_app.settings.selected_row = streq(action, "warnings") ?

@@ -463,6 +463,7 @@ int rd_randomizer(void)
 int rd_options(void)
 {
 	uint8_t b;
+	bool saw_stairs = false, saw_continuous = false;
 
 	/*** Special info */
 
@@ -498,8 +499,11 @@ int rd_options(void)
 			break;
 
 		rd_byte(&value);
+		if (streq(name, "auto_stairs")) saw_stairs = true;
+		if (streq(name, "autoexplore_continuous")) saw_continuous = true;
 		option_set(name, !!value);
 	}
+	options_migrate_exploration(&player->opts, saw_stairs, saw_continuous);
 
 	return 0;
 }

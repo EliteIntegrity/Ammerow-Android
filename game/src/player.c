@@ -27,6 +27,7 @@
 #include "obj-pile.h"
 #include "obj-util.h"
 #include "player-birth.h"
+#include "player-explore.h"
 #include "player-calcs.h"
 #include "player-history.h"
 #include "player-quest.h"
@@ -490,6 +491,7 @@ bool player_spelunking_set_system(struct player *p,
 
 void player_cleanup_members(struct player *p)
 {
+	player_explore_free(p);
 	world_player_clear_ledgers(p);
 	player_spelunking_clear(p);
 	mem_free(p->fishing);

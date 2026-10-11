@@ -30,6 +30,10 @@ Menu, then Settings.  The pages are:
   Display / Performance   map zoom, animated combat, the warning border
                           (see below), and whether the weather is shown
                           (it chooses itself; its sound is under Sound)
+  Controls & Convenience  what Explore does, whether Up and Down walk to
+                          stairs, picking up items, item ignoring, all
+                          the gameplay options, and saving these for new
+                          characters (see below)
 
 Tap a setting to change it.  Each tap moves it on, and past the last
 choice it comes back round to the first, so a tap can always undo a
@@ -48,6 +52,8 @@ Character creation
 On the origin, class and attribute-method choices, Options opens the
 birth options: tap an option, or press Toggle, to switch it.  They are
 fixed once the run starts, and options marked experimental stay so.
+Level feelings (hints of a level's danger and treasure, even what you
+have not found, but not where) are off unless you turn them on there.
 
 Attribute allocation shows each attribute's base value, the origin and
 class modifiers, the final value and the points spent, with the focus,
@@ -56,6 +62,34 @@ the highlighted attribute; Reset starts again.  With the roller, Reroll
 rolls a new candidate and Previous brings back the last one; colours and
 +/- marks compare the final values.  Attributes take effect at
 thresholds, so not every point changes everything.
+
+Controls & Convenience
+----------------------
+
+Explore mode sets what the Explore button does:
+
+  Traditional   walk to the nearest spot you have not seen yet; press
+                Explore again to go on.  New characters start with this.
+  Continuous    keep exploring the level until something needs you: a
+                monster in view, new loot, an injury or other condition,
+                low health, hunger or no light.  A tap anywhere, or any
+                button, stops it.
+  Off           no exploring; the large button offers Wait instead
+
+Exploring never fights for you, and leaves closed doors, known traps,
+shops, stairs and exits to you.  Hidden dangers can still surprise you.
+It does not explore side-view caves.  Starting again counts the loot you
+already know of as seen; passing over it, your pick-up settings apply.
+When it stops, a message says why, with the steps taken and the gold
+collected.
+
+Walk to stairs, on for new characters: away from stairs, Up and Down
+(under More) walk to the nearest known staircase of that kind; press
+again there to take it.  On the surface, Travel still opens the known
+world.
+
+These choices belong to the character you are playing.  Save gameplay
+defaults uses them for characters you create later.
 
 Zoom
 ----

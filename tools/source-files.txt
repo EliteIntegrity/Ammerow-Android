@@ -378,6 +378,8 @@ game/src/player-birth.h
 game/src/player-calcs.c
 game/src/player-calcs.h
 game/src/player-class.c
+game/src/player-explore.c
+game/src/player-explore.h
 game/src/player-history.c
 game/src/player-history.h
 game/src/player-path.c
@@ -554,6 +556,7 @@ game/src/tests/effects/earthquake.c
 game/src/tests/effects/info.c
 game/src/tests/effects/suite.mk
 game/src/tests/game/basic.c
+game/src/tests/game/explore.c
 game/src/tests/game/fishing.c
 game/src/tests/game/game-fixture.h
 game/src/tests/game/larder.c

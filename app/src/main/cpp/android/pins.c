@@ -569,6 +569,7 @@ static void run_pin(int slot)
 			SDL_Keymod mod = (SDL_Keymod)pin->keys[k][1];
 			int text = pin->keys[k][2];
 
+			touch_explain_command_key(key, mod, text);
 			touch_translate_command_key(&key, &mod, &text);
 			touch_press(key, mod, text);
 		}
@@ -788,6 +789,7 @@ static void wake_game(void)
 {
 	SDL_Event event;
 
+	touch_stop_exploring();
 	SDL_zero(event);
 	event.type = SDL_EVENT_KEY_UP;
 	event.key.key = SDLK_UNKNOWN;

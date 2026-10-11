@@ -392,12 +392,38 @@ static int smallest_width_dp(void)
  *    desktop's Standard (120 x 36), whose text is too small to read there.
  *    An update moves only a phone still on Standard; Large would put the
  *    sidebar's health and stamina under the d-pad.
+ * 3. new characters explore with the Explore button and walk to the nearest
+ *    known staircase with Up and Down, as they always have on Android; the
+ *    desktop leaves both off until chosen (default_game_options).
  * It edits the frontend's own settings file before the game reads it, so it
  * is the player's setting from then on, changed in Settings like any other.
  */
 #define LAYOUT_MARKER "lib/user/android-layout.txt"
-#define LAYOUT_VERSION 2
+#define LAYOUT_VERSION 3
 #define SETTINGS_PATH "lib/user/Ammerow/" SDL3_CONFIG_FILE
+#define GAME_OPTIONS_PATH "lib/user/Ammerow/customized_interface_options.txt"
+
+/*
+ * The game's saved defaults for new characters' interface options (written
+ * by Settings, Controls & Convenience, Save gameplay defaults; read in
+ * option.c), with the Android ones: Explore mode Traditional and Walk to
+ * stairs on. A file already there is the player's own and is kept. The
+ * options it leaves out take the game's defaults.
+ */
+static void default_game_options(void)
+{
+	char path[] = GAME_OPTIONS_PATH;
+	FILE *fp;
+
+	if (file_exists(path)) return;
+	make_parents(path);
+	fp = fopen(path, "w");
+	if (!fp) return;
+	fputs("# Android defaults for new characters (Settings, Controls & Convenience).\n"
+		"option:autoexplore_commands:yes\n"
+		"option:auto_stairs:yes\n", fp);
+	fclose(fp);
+}
 
 static void apply_default_layout(void)
 {
@@ -411,6 +437,7 @@ static void apply_default_layout(void)
 		fclose(fp);
 	}
 	if (applied >= LAYOUT_VERSION) return;
+	if (applied < 3) default_game_options();
 	width = smallest_width_dp();
 	rows = width >= 600 ? 6 : 4;
 	phone = width > 0 && width < 600;
@@ -477,7 +504,8 @@ static void apply_default_layout(void)
 		fclose(fp);
 	}
 	SDL_Log("Applied the Android default layout, version %d (messages top right, "
-		"%d lines%s)", LAYOUT_VERSION, rows, phone ? "; phone text size" : "");
+		"%d lines%s; explore and stair defaults)", LAYOUT_VERSION, rows,
+		phone ? "; phone text size" : "");
 }
 
 /*
@@ -615,6 +643,7 @@ JNIEXPORT void JNICALL Java_com_ammerow_game_NativeBridge_pressKey(JNIEnv *env,
 	(void)env;
 	(void)cls;
 	/* Buttons send the original keyset's keys. */
+	touch_explain_command_key(keycode, keymod, codepoint);
 	touch_translate_command_key(&keycode, &keymod, &codepoint);
 	push_key(keycode, keymod, true);
 	const char *chars = ascii_text(codepoint);

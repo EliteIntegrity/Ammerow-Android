@@ -68,6 +68,14 @@ bool touch_key_for_code(keycode_t code, SDL_Keycode *key, SDL_Keymod *mod,
  * command; returns whether it changed. */
 bool touch_translate_command_key(SDL_Keycode *key, SDL_Keymod *mod, int *text);
 
+/* A notice for a button whose command the game's options leave doing
+ * nothing (Explore, with Explore mode Off). */
+void touch_explain_command_key(SDL_Keycode key, SDL_Keymod mod, int text);
+
+/* Stops continuous exploration, as a key press does, before a command that
+ * waits for the command prompt (the rail, the quick bar). Any thread. */
+void touch_stop_exploring(void);
+
 /* Calls a void method on the Activity; false if it is missing or threw. */
 bool touch_call_activity(JNIEnv *env, jobject activity, const char *name,
 	const char *signature, ...);

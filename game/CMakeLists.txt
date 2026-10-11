@@ -409,6 +409,7 @@ add_library(OurCoreLib OBJECT
         src/player-class.c
         src/player-history.c
         src/player-path.c
+        src/player-explore.c
         src/player-properties.c
 		src/player-resource.c
         src/player-quest.c
@@ -1127,6 +1128,7 @@ set(ANGBAND_TEST_CASE_SOURCES
     effects/earthquake.c
     effects/info.c
     game/basic.c
+    game/explore.c
 	game/fishing.c
 	game/larder.c
     game/mage.c

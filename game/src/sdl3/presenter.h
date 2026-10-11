@@ -30,6 +30,7 @@ struct sdl3_inspect_card;
 struct sdl3_screen;
 struct sdl3_theme;
 struct sdl3_audio_settings;
+struct player_options;
 struct sdl3_combat_effects;
 struct world_fishing_runtime;
 
@@ -41,6 +42,8 @@ struct sdl3_presentation_frame {
 	const struct sdl3_home_screen *home;
 	const struct sdl3_pause_menu *pause_menu;
 	const struct sdl3_settings_overlay *settings;
+	const struct player_options *game_options;
+	bool playing;
 	const struct sdl3_screen *screen;
 	const struct sdl3_screen *screen_parent;
 	const char *interface_font_name;

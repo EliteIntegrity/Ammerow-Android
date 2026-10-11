@@ -527,6 +527,7 @@ struct player_upkeep {
 	int resting;			/* Resting counter */
 
 	int running;			/* Running counter */
+	struct player_exploration *exploration; /* Transient, never saved. */
 	bool running_firststep;		/* Is this our first step running or following a precomputed path? */
 
 	struct object **quiver;	/* Quiver objects */

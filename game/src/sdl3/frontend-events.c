@@ -13,6 +13,8 @@
 #include "sdl3/frontend-internal.h"
 
 #include "snd-sdl3.h"
+#include "player-explore.h"
+#include "player-util.h"
 #include "ui-help.h"
 #include "ui-input.h"
 #include "ui-mode-input.h"
@@ -513,12 +515,33 @@ bool sdl3_frontend_dispatch_event(struct sdl3_app *app,
 		handle_host_zoom(app, event);
 		return false;
 	}
+	/* Consume a deliberate interrupt before shortcuts can open an overlay
+	 * and accidentally leave the simulation running behind it. */
+	if (player_explore_active(player) &&
+			(event->type == SDL_EVENT_KEY_DOWN ||
+			 event->type == SDL_EVENT_MOUSE_BUTTON_DOWN)) {
+		player_explore_cancel(player, "stopped by you");
+		disturb(player);
+		sdl3_input_gate_arm(&app->input_gate);
+		app->suppress_text_codepoint = 0;
+		return false;
+	}
 	switch (event->type) {
 	case SDL_EVENT_QUIT:
 		terms_disconnecting = 1;
 		return true;
 	case SDL_EVENT_KEY_DOWN:
 		app->suppress_text_codepoint = 0;
+		/* Holding p must not restart exploration past its safety stops. */
+		if (event->key.repeat && event->key.key == SDLK_P && player &&
+				OPT(player, autoexplore_commands) &&
+				OPT(player, autoexplore_continuous) &&
+				app->presentation.phase == SDL3_PRESENTATION_WORLD &&
+				!app->settings.visible && !app->pause_menu.visible &&
+				!app->home.visible) {
+			app->suppress_text_codepoint = 'p';
+			return true;
+		}
 		if (event->key.repeat && event->key.key == SDLK_P &&
 				app->spelunk_peek_key_down) {
 			app->suppress_text_codepoint =

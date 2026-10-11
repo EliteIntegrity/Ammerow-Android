@@ -46,6 +46,7 @@
 #include "option.h"
 #include "player.h"
 #include "player-calcs.h"
+#include "player-explore.h"
 #include "player-timed.h"
 #include "player-util.h"
 #include "store.h"
@@ -263,7 +264,8 @@ enum context_flag {
 	FLAG_CAN_THROW = 8,        /* carries a throwing weapon (or flask) */
 	FLAG_MONSTER_IN_VIEW = 16, /* as the game checks before exploring */
 	FLAG_IN_RUN = 32,          /* a run is in play (any screen) */
-	FLAG_TRAVEL = 64           /* on the surface, '<' opens known-world travel */
+	FLAG_TRAVEL = 64,          /* on the surface, '<' opens known-world travel */
+	FLAG_EXPLORE_OFF = 128     /* Explore mode Off: the game's explore does nothing */
 };
 
 /* True when row 0 of the main term shows the -more- prompt. */
@@ -571,9 +573,6 @@ static int home_page(void)
 
 static void current_context(int *mode, int *primary, int *flags, int *detail)
 {
-	/* Whether this run has had its touch-friendly options set. */
-	static bool run_configured = false;
-
 	bool in_run = player && player->upkeep && character_generated &&
 		character_dungeon && cave && player->cave && !player->is_dead &&
 		player->upkeep->playing;
@@ -589,7 +588,6 @@ static void current_context(int *mode, int *primary, int *flags, int *detail)
 	/* Character creation asks for a name and questions before any run. */
 	if (!inkey_flag && prompt_context(mode, detail)) return;
 	if (!in_run) {
-		run_configured = false;
 		*detail = shown_screen == UI_SCREEN_OPTIONS ? PAGE_OPTIONS :
 			shown_screen == UI_SCREEN_RUN_SUMMARY ? PAGE_RUN_SUMMARY :
 			home_page() != PAGE_OTHER ? home_page() : outside_page;
@@ -597,14 +595,6 @@ static void current_context(int *mode, int *primary, int *flags, int *detail)
 	}
 	/* Whatever follows this run (death, Home) starts from a plain page. */
 	outside_page = PAGE_OTHER;
-	if (!run_configured) {
-		/* Explore (under More) needs the game's autoexplore commands, which
-		 * are off by default; with them on, Up and Down away from stairs
-		 * walk to the nearest known staircase. Set once per run, so a
-		 * player who turns them off in Options keeps that choice. */
-		player->opts.opt[OPT_autoexplore_commands] = true;
-		run_configured = true;
-	}
 	if (can_cast()) *flags |= FLAG_CAN_CAST;
 	if (can_fire()) *flags |= FLAG_CAN_FIRE;
 	if (can_throw()) *flags |= FLAG_CAN_THROW;
@@ -633,6 +623,7 @@ static void current_context(int *mode, int *primary, int *flags, int *detail)
 		*mode = MODE_MAP;
 		*primary = primary_action();
 		if (textui_travel_uses_up_key_here(player, cave)) *flags |= FLAG_TRAVEL;
+		if (!OPT(player, autoexplore_commands)) *flags |= FLAG_EXPLORE_OFF;
 		if (player_has_monster_in_view(player)) {
 			*flags |= FLAG_MONSTER_IN_VIEW;
 			*detail = again_kind(name, sizeof(name));
@@ -1710,6 +1701,27 @@ bool touch_translate_command_key(SDL_Keycode *key, SDL_Keymod *mod, int *text)
 	return button_key(rogue, key, mod, text);
 }
 
+/* Explore mode Off (Settings, Controls & Convenience) leaves the game's
+ * explore command doing nothing, so an Explore button (under More, or on the
+ * quick bar) says why instead. Safe from any thread, as above. */
+void touch_explain_command_key(SDL_Keycode key, SDL_Keymod mod, int text)
+{
+	const struct cmd_info *cmd;
+	keycode_t code;
+
+	if (!inkey_flag || !player || !character_dungeon ||
+			OPT(player, autoexplore_commands)) {
+		return;
+	}
+	if (player->fishing && player->fishing->active) return;
+	if (world_player_mode_has_capability(player, WORLD_MODE_CAP_SIDE_VIEW)) return;
+	code = button_keycode(key, mod, text);
+	cmd = code ? original_command(code) : NULL;
+	if (cmd && cmd->cmd == CMD_EXPLORE) {
+		touch_notice("Explore mode is Off: Menu, Settings, Controls & Convenience.");
+	}
+}
+
 /* ---- Commands from the rail --------------------------------------------- */
 
 /*
@@ -1761,6 +1773,18 @@ void touch_press(SDL_Keycode key, SDL_Keymod mod, int text)
 	press(key, mod, text);
 }
 
+/* Continuous exploration stops for a key press, which the game takes for
+ * nothing else (src/sdl3/frontend-events.c). The rail and the quick bar wake
+ * the game with a key release instead and run at its next command prompt,
+ * which exploring would put off until it stopped by itself: while it goes
+ * on, they press a key that means nothing first. */
+void touch_stop_exploring(void)
+{
+	if (player_explore_active(player)) {
+		push_key_event(SDLK_UNKNOWN, SDL_KMOD_NONE, true);
+	}
+}
+
 bool touch_key_for_code(keycode_t code, SDL_Keycode *key, SDL_Keymod *mod,
 	int *text)
 {
@@ -1779,6 +1803,7 @@ JNIEXPORT void JNICALL Java_com_ammerow_game_NativeBridge_runCommand(JNIEnv *env
 	command_closing = false;
 	SDL_SetAtomicInt(&command_pending, 1);
 	/* Wake the game so the command is looked at straight away. */
+	touch_stop_exploring();
 	push_key_event(SDLK_UNKNOWN, SDL_KMOD_NONE, false);
 }
 

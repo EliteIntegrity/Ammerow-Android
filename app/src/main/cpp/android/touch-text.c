@@ -69,6 +69,20 @@ static const struct rewrite lines[] = {
 	{ "Click/Enter changes   Arrows select/change   Esc back   F1/? guide",
 		"Tap cycles   Back for categories   Help opens the guide" },
 	{ "PgUp/PgDn / wheel scroll   Esc home", "PgUp/PgDn scroll   Back returns home" },
+	/* Settings, Controls & Convenience: the keys are buttons (Explore; Up and
+	 * Down; Options under More). Labels have 22 columns. */
+	{ "Explore mode (p)", "Explore mode" },
+	{ "Walk to stairs (< / >)", "Walk to stairs" },
+	{ "Open (= in game)", "Open (More, Options)" },
+	{ "p explores; < / > walk to stairs. Surface < opens the world map.",
+		"The Explore button explores; Up and Down walk to known stairs." },
+	{ "Gameplay defaults saved. Press any key.", "Gameplay defaults saved. OK continues." },
+	{ "Could not save gameplay defaults. Press any key.",
+		"Could not save gameplay defaults. OK continues." },
+	/* Continuous exploration starting; no longer than the original, which is
+	 * placed by its length */
+	{ "Exploring... any key or click stops. Combat remains manual.",
+		"Exploring... any tap or button stops. Combat stays manual." },
 
 	/* Prompts */
 	{ "Direction ('*' or <click> to target, \"'\" for closest, Escape to cancel)? ",

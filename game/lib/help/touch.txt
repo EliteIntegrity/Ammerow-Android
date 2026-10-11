@@ -59,7 +59,9 @@ Explore, when the large button is busy with something else).  On the
 surface, Travel (the known world) takes the ranged attack's place until
 something comes into view.  Explore stops when it gets there, or when
 something comes into view, and does not start with a monster in sight.
-To wait a turn, tap the centre of the d-pad.
+Settings, Controls & Convenience can make it Continuous, exploring on
+until something needs you (a tap stops it), or turn it Off, when the
+large button is Wait.  To wait a turn, tap the centre of the d-pad.
 
 When a monster comes into view, the large button becomes your ranged
 attack: Fire (with a launcher and ammunition for it), otherwise Use magic

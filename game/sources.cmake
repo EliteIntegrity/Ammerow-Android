@@ -146,6 +146,7 @@ set(AMMEROW_CORE_SOURCES
     src/player-class.c
     src/player-history.c
     src/player-path.c
+    src/player-explore.c
     src/player-properties.c
     src/player-resource.c
     src/player-quest.c

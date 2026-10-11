@@ -2358,7 +2358,8 @@ void sdl3_visual_render(struct sdl3_visual *visual, SDL_Renderer *renderer,
 		frame->big_stat_cards, frame->animated_combat, frame->edge_warnings, frame->tile_mode,
 		frame->hybrid_tile_size,
 		frame->dock_placement,
-		frame->dock_rows, frame->dock_cols, frame->audio);
+		frame->dock_rows, frame->dock_cols, frame->audio,
+		frame->game_options, frame->playing);
 
 	present_started = SDL_GetTicksNS();
 	SDL_RenderPresent(renderer);

@@ -256,12 +256,12 @@ int context_menu_player(int mx, int my)
 
 	/* if player is on stairs or autoexplore commands are enabled,
 		add option to use them */
-	if (square_isupstairs(cave, player->grid) || autoexplore) {
+	if (square_isupstairs(cave, player->grid) || OPT(player, auto_stairs)) {
 		ADD_LABEL("Go Up", CMD_GO_UP, MN_ROW_VALID);
 	}
 	if (square_isdownstairs(cave, player->grid) ||
 			world_entry_cross_mode_route_here(cave, player->grid) ||
-			autoexplore) {
+			OPT(player, auto_stairs)) {
 		ADD_LABEL("Go Down", CMD_GO_DOWN, MN_ROW_VALID);
 	}
 	if (autoexplore) {

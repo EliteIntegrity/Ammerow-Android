@@ -173,6 +173,8 @@ object ContextFlags {
     const val IN_RUN = 32
     /** On one of the surface areas, away from stairs: "<" opens known-world travel. */
     const val TRAVEL = 64
+    /** Explore mode is Off (Settings, Controls & Convenience): the game will not explore. */
+    const val EXPLORE_OFF = 128
 }
 
 /**
@@ -290,8 +292,9 @@ data class Dpad(
 object ControlLayouts {
     private val ok = Command("OK", Action.Key(Keys.RETURN))
     private val back = Command("Back", Action.Key(Keys.ESCAPE))
-    // The game's auto-explore: each press walks to the nearest unexplored spot. It does
-    // nothing with a monster in view, so the map's buttons offer it only when none is.
+    // The game's auto-explore: each press walks to the nearest unexplored spot, or with
+    // Explore mode Continuous goes on until something needs the player (a tap stops it).
+    // It does nothing with a monster in view, so the map's buttons offer it only when none is.
     private val explore = cmd("Explore", 'p')
     // Rest asks how long; Return takes the default, "as needed".
     private val rest = Command("Rest", Action.Keys(listOf(typed('R'), Action.Key(Keys.RETURN))))
@@ -423,7 +426,8 @@ object ControlLayouts {
      * moves beside it. Once the character has shot, cast or thrown at it, the
      * large button does that again, with the attack from the start beside it.
      * On the surface with nothing in view, Travel (the known world) takes the
-     * attack's place. Waiting a turn is the d-pad's centre.
+     * attack's place. Waiting a turn is the d-pad's centre. With Explore mode
+     * Off, Wait has Explore's place on the large button and Look beside it.
      */
     private fun mapCluster(context: GameContext, verbs: List<Verb>): Cluster {
         val attacks = attacks(context)
@@ -431,6 +435,9 @@ object ControlLayouts {
         val placeHere = context.primary != Primary.NONE
         if (!context.has(ContextFlags.MONSTER_IN_VIEW)) {
             val second = if (context.has(ContextFlags.TRAVEL)) travel else attacks.firstOrNull()
+            if (context.has(ContextFlags.EXPLORE_OFF)) {
+                return Cluster(if (placeHere) place else hold, listOf(rest, second, look))
+            }
             // Explore stays one tap away when the big button is busy with something else.
             return if (placeHere) Cluster(place, listOf(rest, second, explore))
             else Cluster(explore, listOf(rest, second, look))
