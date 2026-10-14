@@ -90,7 +90,8 @@ fallback; their complete notices are in
 ## Ammerow artwork and audio
 
 Official APKs also contain Ammerow's compiled ASCII-art plates, its 32x32 and
-64x64 Hybrid sprite sheets, its sound effects and Home theme (converted to Ogg
+64x64 Hybrid sprite sheets and Full Tile scenery sheets (walls, woodland and
+village stonework), its sound effects and Home theme (converted to Ogg
 Vorbis for Android) and the official launcher icon. These are Ammerow's own
 assets, separately licensed under `ASSET-LICENSE.md`, not third-party
 components and not under the GPL; they are not in this repository. Their

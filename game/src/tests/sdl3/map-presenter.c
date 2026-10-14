@@ -17,11 +17,15 @@
 #include "player-calcs.h"
 #include "player-timed.h"
 #include "world-spelunking-runtime.h"
+#include "world-entry.h"
+#include "world-overworld.h"
 #include "target.h"
+#include "trap.h"
 #include "ui-map.h"
 #include "ui-prefs.h"
 #include "sdl3/map-presenter.h"
 #include "sdl3/tiles.h"
+#include "sdl3/zoom.h"
 
 struct fixture {
 	struct sdl3_map_presenter presenter;
@@ -406,8 +410,148 @@ static int test_edge_warning_toggle_and_recovery(void *state)
 	ok;
 }
 
+static int test_full_tile_village_materials_and_gates(void *state)
+{
+	struct chunk *actual = cave_new(66, 198), *known = cave_new(66, 198);
+	struct world_overworld_layout saved_layout = player->overworld_layout;
+	struct loc edges[] = { loc(99, 0), loc(197, 33), loc(99, 65), loc(0, 33) };
+	struct loc inside[] = { loc(99, 1), loc(196, 33), loc(99, 64), loc(1, 33) };
+	struct loc shop = loc(50, 30), bank = loc(50, 1);
+	int i;
+	(void)state;
+	/* Use the supported legacy layout: village at centre, all four exits. */
+	require(world_overworld_layout_set(player, WORLD_OVERWORLD_VERSION, 3, 3, 9, 0));
+	require(world_overworld_rebuild_routes(player));
+	require(world_chunk_set_location(actual, "core.hub", false));
+	square_set_feat(actual, shop, FEAT_PERM);
+	square_set_feat(actual, bank, FEAT_GRANITE);
+	require(streq(sdl3_terrain_full_tile_for_grid(actual, known, shop, FEAT_PERM),
+		"village-masonry"));
+	require(streq(sdl3_terrain_full_tile_for_grid(actual, known, bank, FEAT_GRANITE),
+		"village-rock-bank"));
+	require(streq(sdl3_terrain_full_tile_for_grid(actual, known, bank, FEAT_MERIDIAN_STONE),
+		"meridian-marker-stone"));
+	/* Unknown/mimicked cells cannot leak the underlying feature. */
+	null(sdl3_terrain_full_tile_for_grid(actual, known, shop, FEAT_NONE));
+	null(sdl3_terrain_full_tile_for_grid(actual, known, shop, FEAT_FLOOR));
+	for (i = 0; i < 4; i++) {
+		int delta;
+		require(world_entry_is_edge_exit_grid(actual, inside[i]));
+		for (delta = -3; delta <= 3; delta++) {
+			struct loc edge = edges[i], gate = inside[i];
+			if (i % 2) { edge.y += delta; gate.y += delta; }
+			else { edge.x += delta; gate.x += delta; }
+			square_set_feat(actual, edge, FEAT_PERM);
+			square_set_feat(actual, gate, FEAT_FLOOR);
+			/* Actual knowledge alone must not create a visible exit. */
+			require(streq(sdl3_terrain_full_tile_for_grid(actual, known, edge, FEAT_PERM),
+				"village-rock-bank"));
+			struct grid_data data = { .f_idx = FEAT_PERM };
+			eq(sdl3_terrain_ascii_kind(&data,
+				sdl3_terrain_full_tile_for_grid(actual, known, edge, FEAT_PERM)),
+				SDL3_ASCII_TERRAIN_WALL);
+			square_set_feat(known, gate, FEAT_FLOOR);
+			require(streq(sdl3_terrain_full_tile_for_grid(actual, known, edge, FEAT_PERM),
+				ABS(delta) <= 2 ? "travel-opening" : "village-rock-bank"));
+			eq(sdl3_terrain_ascii_kind(&data,
+				sdl3_terrain_full_tile_for_grid(actual, known, edge, FEAT_PERM)),
+				ABS(delta) <= 2 ? SDL3_ASCII_TERRAIN_OPENING : SDL3_ASCII_TERRAIN_WALL);
+			eq(square(actual, edge)->feat, FEAT_PERM);
+			eq(square(actual, gate)->feat, FEAT_FLOOR);
+		}
+	}
+	/* The victory profile changes colours, not the village material identity. */
+	player->total_winner = true;
+	require(streq(sdl3_terrain_full_tile_for_grid(actual, known, shop, FEAT_PERM),
+		"village-masonry"));
+	player->total_winner = false;
+	actual->depth = 1;
+	require(world_chunk_set_location(actual, "core.main.001", false));
+	null(sdl3_terrain_full_tile_for_grid(actual, known, shop, FEAT_PERM));
+	null(sdl3_terrain_full_tile_for_grid(actual, known, bank, FEAT_GRANITE));
+	cave_free(known);
+	cave_free(actual);
+	player->overworld_layout = saved_layout;
+	require(world_overworld_rebuild_routes(player));
+	ok;
+}
+
 const char *suite_name = "sdl3/map-presenter";
+static int test_ascii_wall_semantics(void *state)
+{
+	struct grid_data data = { .f_idx = FEAT_GRANITE };
+	struct object_kind kind = { 0 };
+	struct trap trap = { 0 };
+	(void)state;
+	eq(sdl3_terrain_ascii_kind(&data, NULL), SDL3_ASCII_TERRAIN_WALL);
+	data.f_idx = FEAT_MAGMA;
+	eq(sdl3_terrain_ascii_kind(&data, NULL), SDL3_ASCII_TERRAIN_WALL);
+	data.f_idx = FEAT_PERM;
+	eq(sdl3_terrain_ascii_kind(&data, "travel-opening"), SDL3_ASCII_TERRAIN_OPENING);
+	/* Every foreground subject, even one using the same symbol, is excluded. */
+	data.m_idx = 1;
+	eq(sdl3_terrain_ascii_kind(&data, NULL), SDL3_ASCII_TERRAIN_NORMAL);
+	data.m_idx = 0; data.first_kind = &kind;
+	eq(sdl3_terrain_ascii_kind(&data, NULL), SDL3_ASCII_TERRAIN_NORMAL);
+	data.first_kind = NULL; data.trap = &trap;
+	eq(sdl3_terrain_ascii_kind(&data, NULL), SDL3_ASCII_TERRAIN_NORMAL);
+	data.trap = NULL; data.hallucinate = true;
+	eq(sdl3_terrain_ascii_kind(&data, "travel-opening"), SDL3_ASCII_TERRAIN_NORMAL);
+	data.hallucinate = false; data.is_player = true;
+	eq(sdl3_terrain_ascii_kind(&data, NULL), SDL3_ASCII_TERRAIN_NORMAL);
+	data.is_player = false; data.surface = GRID_SURFACE_TREE;
+	eq(sdl3_terrain_ascii_kind(&data, NULL), SDL3_ASCII_TERRAIN_NORMAL);
+	data.surface = GRID_SURFACE_EXIT_NORTH;
+	eq(sdl3_terrain_ascii_kind(&data, "travel-opening"), SDL3_ASCII_TERRAIN_NORMAL);
+	data.surface = GRID_SURFACE_NONE;
+	int unchanged[] = { FEAT_NONE, FEAT_FLOOR, FEAT_LAVA, FEAT_CLOSED,
+		FEAT_OPEN, FEAT_MORE, FEAT_LESS, FEAT_RUBBLE, FEAT_PASS_RUBBLE };
+	for (size_t i = 0; i < N_ELEMENTS(unchanged); i++) {
+		data.f_idx = unchanged[i];
+		eq(sdl3_terrain_ascii_kind(&data, NULL), SDL3_ASCII_TERRAIN_NORMAL);
+	}
+	ok;
+}
+
+static int test_square_source_extent(void *state)
+{
+	struct fixture *f = state;
+	f->options.cell_width = 16;
+	f->options.cell_height = 30;
+	f->options.zoom_percent = 200;
+	f->options.ascii_enhanced = true;
+	for (int tile = 0; tile < 2; tile++) {
+		int cols, rows;
+		f->options.tile_mode = tile != 0;
+		f->options.ascii_square = false;
+		configure(f);
+		cols = f->presenter.view.source_cols;
+		require(!f->presenter.view.ascii_enhanced);
+		rows = f->presenter.view.source_rows;
+		f->options.ascii_square = true;
+		configure(f);
+		const struct sdl3_map_view *view = &f->presenter.view;
+		eq(view->ascii_square, tile == 0);
+		eq(view->ascii_enhanced, tile == 0);
+		if (tile) {
+			eq(view->source_cols, cols);
+			eq(view->source_rows, rows);
+		} else {
+			eq(view->source_cols, MIN(cave->width,
+				sdl3_zoom_square_visible_cells(view->cols, 16, 44)));
+			eq(view->source_rows, MIN(cave->height,
+				sdl3_zoom_square_visible_cells(view->rows, 30, 44)));
+		}
+	}
+	f->options.ascii_square = false;
+	f->options.ascii_enhanced = false;
+	ok;
+}
+
 struct test tests[] = {
+	{ "ASCII wall styling excludes subjects, floors and markers", test_ascii_wall_semantics },
+	{ "square source extent and Hybrid independence", test_square_source_extent },
+	{ "Full Tile village materials and known four-way gates", test_full_tile_village_materials_and_gates },
 	{ "warning priority and environmental context", test_edge_warning_policy },
 	{ "warning toggle, independent animation setting and recovery", test_edge_warning_toggle_and_recovery },
 	{ "retained target follows player", test_retained_target_follows_player },

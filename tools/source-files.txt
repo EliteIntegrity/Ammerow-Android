@@ -144,9 +144,14 @@ game/lib/screens/retire-summary.txt
 game/lib/screens/retire.txt
 game/lib/sounds/ammerow/NOTICE.md
 game/lib/tiles/NOTICE.md
+game/lib/tiles/full-32.txt
+game/lib/tiles/full-64.txt
 game/lib/tiles/hybrid-32.txt
 game/lib/tiles/hybrid-64.txt
 game/lib/tiles/pixel-001-index.txt
+game/lib/tiles/terrain-index.txt
+game/lib/tiles/vegetation-index.txt
+game/lib/tiles/village-index.txt
 game/packaging/audio-assets.csv
 game/packaging/runtime-art.txt
 game/packaging/runtime-audio.txt

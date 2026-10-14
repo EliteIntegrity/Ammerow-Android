@@ -1,0 +1,5 @@
+# Full Tile: shared Hybrid sprites, solid scenery, quiet glyph floors.
+atlas:pixel-32-001:pixel-32-001.png:pixel-001-index.txt:32:32
+atlas:terrain:terrain-32.png:terrain-index.txt:32:32
+atlas:vegetation:vegetation-32.png:vegetation-index.txt:32:32
+atlas:village:village-32.png:village-index.txt:32:32

@@ -30,6 +30,12 @@ enum sdl3_tile_glyph_policy {
 	SDL3_TILE_GLYPH_PRESERVE  /* Player, cursor or precise navigation marker. */
 };
 
+enum sdl3_ascii_terrain {
+	SDL3_ASCII_TERRAIN_NORMAL = 0,
+	SDL3_ASCII_TERRAIN_WALL,
+	SDL3_ASCII_TERRAIN_OPENING
+};
+
 struct sdl3_terrain_variant {
 	wchar_t codepoint;
 	uint8_t foreground;
@@ -37,8 +43,12 @@ struct sdl3_terrain_variant {
 	uint8_t style;
 	const struct terrain_visual_recipe *recipe;
 	const char *tile_id;
+	/** Optional scenery identity consumed only by Full Tile. */
+	const char *full_tile_id;
 	const char *tile_overlay_key;
 	enum sdl3_tile_glyph_policy tile_glyph_policy;
+	/** Only unobscured, knowledge-safe terrain may receive ASCII styling. */
+	enum sdl3_ascii_terrain ascii_terrain;
 	/** Zero uses the theme default; otherwise 0..255 remembered brightness. */
 	uint8_t remembered_brightness;
 	bool in_view;
@@ -56,6 +66,10 @@ uint32_t sdl3_terrain_level_key(int32_t level_turn, int depth, int width,
 		int height);
 const struct terrain_visual_recipe *sdl3_terrain_recipe_for_grid(
 		struct chunk *c, struct loc grid, int feature);
+const char *sdl3_terrain_full_tile_for_grid(struct chunk *c,
+		struct chunk *known, struct loc grid, int exposed_feature);
+enum sdl3_ascii_terrain sdl3_terrain_ascii_kind(const struct grid_data *data,
+		const char *full_tile_id);
 const char *sdl3_terrain_style_name(enum sdl3_terrain_style style);
 bool sdl3_terrain_style_from_name(const char *name,
 		enum sdl3_terrain_style *style);

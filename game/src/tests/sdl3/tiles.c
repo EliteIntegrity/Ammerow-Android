@@ -163,8 +163,24 @@ static int test_moving_subject_64(void *unused)
 	return check_moving_subject(64);
 }
 
+static int test_presentation_modes(void *unused)
+{
+	(void)unused;
+	eq(sdl3_tile_mode_change(SDL3_TILE_MODE_ASCII, 1, false), SDL3_TILE_MODE_HYBRID);
+	eq(sdl3_tile_mode_change(SDL3_TILE_MODE_HYBRID, 1, false), SDL3_TILE_MODE_ASCII);
+	eq(sdl3_tile_mode_change(SDL3_TILE_MODE_ASCII, -1, false), SDL3_TILE_MODE_HYBRID);
+	eq(sdl3_tile_mode_change(SDL3_TILE_MODE_HYBRID, 1, true), SDL3_TILE_MODE_FULL);
+	eq(sdl3_tile_mode_change(SDL3_TILE_MODE_FULL, 1, true), SDL3_TILE_MODE_ASCII);
+	eq(sdl3_tile_mode_change(SDL3_TILE_MODE_ASCII, -1, true), SDL3_TILE_MODE_FULL);
+	eq(sdl3_tile_mode_change(SDL3_TILE_MODE_FULL, -1, true), SDL3_TILE_MODE_HYBRID);
+	eq(sdl3_tile_mode_change(SDL3_TILE_MODE_FULL, 0, false), SDL3_TILE_MODE_HYBRID);
+	require(streq(sdl3_tile_mode_name(SDL3_TILE_MODE_FULL), "Full Tile"));
+	ok;
+}
+
 const char *suite_name = "sdl3/tiles";
 struct test tests[] = {
+	{ "trial presentation cycling preserves ordinary modes", test_presentation_modes },
 	{ "stable keys and normalization", test_stable_keys_and_normalization },
 	{ "hybrid loading and cleanup", test_hybrid_loading_and_cleanup },
 	{ "moving subject retains 32px sprite", test_moving_subject_32 },

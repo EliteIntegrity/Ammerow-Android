@@ -29,6 +29,9 @@ The covered assets are:
   experimental masters `assets/experiments/portrait-pixels/tiles/pixel-*.png`,
   transformed from the separately licensed, image-generated source
   illustrations also used for the ASCII art;
+- the Full Tile scenery sheets `lib/tiles/terrain-*.png`,
+  `lib/tiles/vegetation-*.png` and `lib/tiles/village-*.png`, and their
+  image-generated source artwork retained under `assets/experiments/full-tiles/`;
 - the authored sound-effect and home-music WAV files under
   `lib/sounds/ammerow/`, including its subdirectories;
 - the official marketing and store artwork under `assets/marketing/`,

@@ -1,6 +1,7 @@
 # Ammerow tile atlases
 
-`pixel-*.png` are generated pages of separately licensed Ammerow visual assets.
+`pixel-*.png`, `terrain-*.png`, `vegetation-*.png` and `village-*.png`
+are generated pages of separately licensed Ammerow visual assets.
 They are not covered by the GPL that applies to the program.
 
 Copyright © 2026 John Horton. All rights reserved except as expressly permitted.
@@ -33,3 +34,17 @@ cards and shopkeepers continue to use the compiled ASCII illustrations.
 These sheets are governed by the separate asset terms above. Their optional
 runtime mappings are editable text; image files are not included in the
 program source release.
+
+## Full Tile scenery
+
+Full Tile uses the same Hybrid sprites plus 32x32 or 64x64 scenery sheets.
+The walls, ore, woodland, weathered rock banks, cut masonry and violet-veined
+slate began as OpenAI-generated source images under human direction, then
+were deterministically sampled. Opaque wall edges were matched for seamless
+repetition; vegetation retains transparency. Traversable boundary openings
+use a transparent cell, and ordinary floors retain their coloured glyphs on
+black. These additions do not replace the original Hybrid mappings.
+
+Full Tile scenery has the same separate asset terms above. Source images and
+PNG sheets are excluded from the program source release; text mappings remain
+GPL-covered. There is no live image generation during play.

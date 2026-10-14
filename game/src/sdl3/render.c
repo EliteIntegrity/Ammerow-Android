@@ -761,6 +761,36 @@ static SDL_FRect map_viewport(const struct sdl3_visual *visual,
 	};
 }
 
+static bool draw_map_glyph(struct sdl3_font *font, SDL_Renderer *renderer,
+		const struct sdl3_map_view *view, uint32_t codepoint, SDL_Color color,
+		float x, float y, float width, float height)
+{
+	if (view->ascii_square && !view->tile_mode)
+		return sdl3_font_draw_square(font, renderer, codepoint, color,
+			x, y, width, height);
+	return sdl3_font_draw(font, codepoint, color, x, y, width, height);
+}
+
+static bool draw_map_terrain_glyph(struct sdl3_font *font, SDL_Renderer *renderer,
+		const struct sdl3_map_view *view, const struct sdl3_cell *cell,
+		const struct sdl3_terrain_variant *variant, SDL_Color color,
+		const SDL_FRect *rect)
+{
+	if (!view->tile_mode && variant &&
+			cell->codepoint == variant->codepoint &&
+			cell->foreground == variant->foreground) {
+		/* The actual crossing/arrow is inside the rim. Remove only its known
+		 * outer wall; neither the map nor movement rules are modified. */
+		if (variant->ascii_terrain == SDL3_ASCII_TERRAIN_OPENING) return true;
+		if (view->ascii_square && view->ascii_enhanced &&
+				variant->ascii_terrain == SDL3_ASCII_TERRAIN_WALL)
+			return sdl3_font_draw_square_wall(font, renderer, cell->codepoint,
+				color, rect->x, rect->y, rect->w, rect->h);
+	}
+	return draw_map_glyph(font, renderer, view, cell->codepoint, color,
+		rect->x, rect->y, rect->w, rect->h);
+}
+
 struct sdl3_map_camera {
 	SDL_FRect viewport;
 	float cell_width;
@@ -813,6 +843,10 @@ static struct sdl3_map_camera map_camera(const struct sdl3_visual *visual,
 			map_view->zoom_percent, pixel_art_snap ? 32 : 0);
 		result.cell_width = (float)side;
 		result.cell_height = (float)side;
+	} else if (map_view->ascii_square) {
+		int side = sdl3_zoom_square_size(visual->cell_width,
+			visual->cell_height, map_view->zoom_percent);
+		result.cell_width = result.cell_height = (float)side;
 	} else {
 		result.cell_width = (float)SDL_max(1,
 			(visual->cell_width * map_view->zoom_percent + 50) / 100);
@@ -996,10 +1030,10 @@ static void draw_combat_effect(struct sdl3_visual *visual,
 		for (i = 0; number[i]; i++) {
 			SDL_Color shadow = { 0, 0, 0, color.a };
 
-			sdl3_font_draw(map_font, (uint32_t)number[i], shadow,
+			draw_map_glyph(map_font, renderer, map_view, (uint32_t)number[i], shadow,
 				x + i * glyph_width + 2.0f, y + 2.0f,
 				glyph_width, glyph_height);
-			sdl3_font_draw(map_font, (uint32_t)number[i], color,
+			draw_map_glyph(map_font, renderer, map_view, (uint32_t)number[i], color,
 				x + i * glyph_width, y, glyph_width, glyph_height);
 		}
 		SDL_SetRenderClipRect(renderer, NULL);
@@ -1055,7 +1089,7 @@ static void draw_combat_effect(struct sdl3_visual *visual,
 					map_view, subject, cell, &moving_rect);
 			}
 			if (!subject_drawn) {
-				sdl3_font_draw(map_font, (uint32_t)cell->codepoint,
+				draw_map_glyph(map_font, renderer, map_view, (uint32_t)cell->codepoint,
 					foreground, moving_rect.x, moving_rect.y,
 					moving_rect.w, moving_rect.h);
 			}
@@ -1073,7 +1107,7 @@ static void draw_combat_effect(struct sdl3_visual *visual,
 			SDL_SetRenderDrawColor(renderer, impact.r, impact.g, impact.b,
 				impact.a);
 			SDL_RenderRect(renderer, &pulse);
-			sdl3_font_draw(map_font,
+			draw_map_glyph(map_font, renderer, map_view,
 				effect->hit ? (uint32_t)'*' : (uint32_t)'/', impact,
 				target_rect.x, target_rect.y, target_rect.w, target_rect.h);
 		}
@@ -1102,7 +1136,7 @@ static void draw_combat_effect(struct sdl3_visual *visual,
 		SDL_RenderLine(renderer, sx, sy, x, y);
 		glyph_width = target_rect.w * 1.30f;
 		glyph_height = target_rect.h * 1.18f;
-		sdl3_font_draw(map_font,
+		draw_map_glyph(map_font, renderer, map_view,
 			effect->glyph ? (uint32_t)effect->glyph : (uint32_t)'*', color,
 			x - glyph_width * 0.5f, y - glyph_height * 0.5f,
 			glyph_width, glyph_height);
@@ -1162,7 +1196,7 @@ static void draw_player_vitality(struct sdl3_visual *visual,
 		(int)camera.viewport.w, (int)camera.viewport.h
 	};
 	SDL_SetRenderClipRect(renderer, &clip);
-	sdl3_font_draw(map_font, (uint32_t)'@', color, rect.x, rect.y,
+	draw_map_glyph(map_font, renderer, map_view, (uint32_t)'@', color, rect.x, rect.y,
 		rect.w, rect.h);
 	SDL_SetRenderClipRect(renderer, NULL);
 }
@@ -1518,8 +1552,8 @@ static bool update_zoom_out_texture(struct sdl3_visual *visual,
 			SDL_SetRenderDrawColor(renderer, background.r, background.g,
 				background.b, background.a);
 			SDL_RenderFillRect(renderer, &rect);
-			sdl3_font_draw(font, (uint32_t)cell->codepoint,
-				foreground, rect.x, rect.y, rect.w, rect.h);
+			draw_map_terrain_glyph(font, renderer, map_view, cell, variant,
+				foreground, &rect);
 			(*updates)++;
 		}
 	}
@@ -1579,7 +1613,7 @@ static int draw_zoomed_subject_art(struct sdl3_visual *visual,
 		SDL_RenderFillRect(renderer, &rect);
 		if (!draw_map_subject_art(visual, renderer, map_view, subject, cell,
 				&rect)) {
-			sdl3_font_draw(&visual->map_font, (uint32_t)cell->codepoint,
+			draw_map_glyph(&visual->map_font, renderer, map_view, (uint32_t)cell->codepoint,
 				foreground, rect.x, rect.y, rect.w, rect.h);
 		}
 		updates++;
@@ -1629,7 +1663,14 @@ static bool draw_map_tile_cell(struct sdl3_visual *visual,
 	SDL_SetRenderDrawColor(renderer, background.r, background.g, background.b,
 		background.a);
 	SDL_RenderFillRect(renderer, rect);
-	if (variant && variant->tile_id && sdl3_tile_make_key(feature_key,
+	if (variant && visual->tile_mode == SDL3_TILE_MODE_FULL &&
+			variant->full_tile_id && sdl3_tile_make_key(feature_key,
+			sizeof(feature_key), SDL3_TILE_FEATURE, variant->full_tile_id)) {
+		terrain_drawn = sdl3_tiles_draw(&visual->tiles, renderer, feature_key,
+			world_col, world_row, rect, brightness);
+	}
+	/* Incomplete media still falls back to the normal feature/glyph. */
+	if (!terrain_drawn && variant && variant->tile_id && sdl3_tile_make_key(feature_key,
 			sizeof(feature_key), SDL3_TILE_FEATURE, variant->tile_id)) {
 		terrain_drawn = sdl3_tiles_draw(&visual->tiles, renderer, feature_key,
 			world_col, world_row, rect, brightness);
@@ -1646,7 +1687,7 @@ static bool draw_map_tile_cell(struct sdl3_visual *visual,
 		source_cell, world_col, world_row, rect, brightness);
 	if (!subject_drawn && ((variant && variant->tile_glyph_policy == SDL3_TILE_GLYPH_PRESERVE) ||
 			!(terrain_only && terrain_drawn))) {
-		sdl3_font_draw(font, (uint32_t)cell->codepoint, foreground,
+		draw_map_glyph(font, renderer, map_view, (uint32_t)cell->codepoint, foreground,
 			rect->x, rect->y, rect->w, rect->h);
 	}
 	return true;
@@ -1726,8 +1767,8 @@ static int draw_scaled_map(struct sdl3_visual *visual,
 				SDL_SetRenderDrawColor(renderer, background.r, background.g,
 					background.b, background.a);
 				SDL_RenderFillRect(renderer, &rect);
-				sdl3_font_draw(font, (uint32_t)cell->codepoint,
-					foreground, rect.x, rect.y, rect.w, rect.h);
+				draw_map_terrain_glyph(font, renderer, map_view, cell, variant,
+					foreground, &rect);
 				updates++;
 			}
 		}
@@ -2254,16 +2295,28 @@ void sdl3_visual_render(struct sdl3_visual *visual, SDL_Renderer *renderer,
 	SDL_Color canvas = theme ? theme->canvas :
 		(SDL_Color){ 0, 0, 0, SDL_ALPHA_OPAQUE };
 	int tile_size = frame->tile_mode ? (frame->hybrid_tile_size == 32 ? 32 : 64) : 0;
-	if (visual->hybrid_tile_size != tile_size) {
+	bool ascii_square = frame->ascii_square && !frame->tile_mode;
+	bool ascii_enhanced = ascii_square && frame->ascii_enhanced;
+	if (visual->ascii_square != ascii_square ||
+			visual->ascii_enhanced != ascii_enhanced) {
+		visual->ascii_square = ascii_square;
+		visual->ascii_enhanced = ascii_enhanced;
+		sdl3_visual_invalidate_grid_cache(visual);
+	}
+	if (visual->hybrid_tile_size != tile_size || visual->tile_mode != frame->tile_mode) {
 		char manifest[32];
 
 		sdl3_tiles_free(&visual->tiles);
 		visual->hybrid_tile_size = tile_size;
+		visual->tile_mode = frame->tile_mode;
 		if (tile_size) {
-			strnfmt(manifest, sizeof(manifest), "hybrid-%d.txt", tile_size);
+			strnfmt(manifest, sizeof(manifest), "%s-%d.txt",
+				frame->tile_mode == SDL3_TILE_MODE_FULL ? "full" : "hybrid",
+				tile_size);
 			if (!sdl3_tiles_init(&visual->tiles, renderer, manifest)) {
 				SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-					"Hybrid %dpx portraits unavailable; using ordinary glyphs", tile_size);
+					"%s %dpx assets unavailable; using ordinary glyphs",
+					sdl3_tile_mode_name(frame->tile_mode), tile_size);
 			}
 		}
 		sdl3_visual_invalidate_grid_cache(visual);
@@ -2356,7 +2409,7 @@ void sdl3_visual_render(struct sdl3_visual *visual, SDL_Renderer *renderer,
 		frame->visible_weather ? SDL3_WEATHER_AUTO : SDL3_WEATHER_OFF,
 		frame->fullscreen, frame->dock_visible, frame->hud_stats_visible,
 		frame->big_stat_cards, frame->animated_combat, frame->edge_warnings, frame->tile_mode,
-		frame->hybrid_tile_size,
+		frame->hybrid_tile_size, frame->ascii_square, frame->ascii_enhanced,
 		frame->dock_placement,
 		frame->dock_rows, frame->dock_cols, frame->audio,
 		frame->game_options, frame->playing);

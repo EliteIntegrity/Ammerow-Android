@@ -52,6 +52,7 @@
 #include "world-larder.h"
 #include "world-larder-data.h"
 #include "world-location.h"
+#include "world-overworld.h"
 #include "world-spelunking-adapter.h"
 #include "world-spelunking-runtime.h"
 #include "world-spelunking-traversal-proof.h"
@@ -1090,6 +1091,16 @@ static bool initialize_player(const struct headless_scenario *scenario,
 		return runner_error(error, error_size,
 			"unknown race or class in scenario", scenario->name);
 	}
+	/* Opt-in fixed surface layout for gate/travel captures. Keep the existing
+	 * scenario contract unchanged when omitted. Zero selects the supported
+	 * legacy layout with the village in the centre and four real exits. */
+	if (scenario->has_overworld_seed &&
+			(!world_overworld_layout_set(player, WORLD_OVERWORLD_VERSION,
+				WORLD_OVERWORLD_LAUNCH_WIDTH, WORLD_OVERWORLD_LAUNCH_HEIGHT,
+				WORLD_OVERWORLD_LAUNCH_CELLS, scenario->overworld_seed) ||
+			 !world_overworld_rebuild_routes(player))) {
+		return runner_error(error, error_size, "could not set overworld layout", NULL);
+	}
 	for (i = 0; i < scenario->inventory_count; i++) {
 		if (!give_scenario_item(scenario->inventory[i],
 				scenario->inventory_quantity[i], false, error, error_size)) {
@@ -1217,6 +1228,9 @@ static void write_replay_header(struct headless_output *output,
 	file_putf(output->replay, "bot:scripted\ncapture:%s\nexpect:%s\n",
 		capture_name(scenario->capture),
 		expected_result_name(scenario->expected_result));
+	if (scenario->has_overworld_seed) {
+		file_putf(output->replay, "overworld-seed:%u\n", scenario->overworld_seed);
+	}
 	if (scenario->interface_font[0]) {
 		file_putf(output->replay, "interface-font:%s\n",
 			scenario->interface_font);
@@ -1234,6 +1248,7 @@ static void write_replay_header(struct headless_output *output,
 		file_putf(output->replay, "map-presentation:%s\n",
 			scenario->map_presentation);
 	}
+	file_putf(output->replay, "ascii-grid:%s\n", scenario->ascii_grid);
 	file_putf(output->replay, "map-zoom:%d\n",
 		scenario->map_zoom_percent);
 	if (scenario->screen_width && scenario->screen_height) {

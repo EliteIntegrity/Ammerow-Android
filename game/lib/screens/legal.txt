@@ -1,4 +1,4 @@
-# Adapted from desktop lib/screens/legal.txt sha256 9eed85dd9957dab6ca3c8721c62af90b84dc20bf5860da809c612fa4cf742c94
+# Adapted from desktop lib/screens/legal.txt sha256 3c1f4673363188c5d936a38c04eaa84a3033179339b9f822baa0ff627ce7c504
 # Player-facing copyright and licence summary for the Android edition.
 # Complete terms are in the referenced files, packaged in the APK's assets/legal/
 # folder and in the source.
@@ -75,6 +75,7 @@ notice:The official Android release includes compiled FROGART3 ASCII portraits, 
 notice:Missing map tiles use ordinary glyphs; missing portraits use the normal fallback presentation. Missing effects use the program's code-synthesised fallback; missing music is silent.
 notice:The ASCII portraits and Hybrid sprites derive from the same image-generated source illustrations, made under human direction. The Hybrid conversion crops and samples those illustrations; it does not convert rendered ASCII glyphs and uses no new image generation. Conversion does not change the source provenance or separate asset terms.
 notice:The effects were produced with custom deterministic synthesis under human direction. The home theme was composed through Claude Compose and rendered using licensed virtual instruments in Ableton Live. Their production records distinguish those processes from image generation.
+notice:Full Tile adds 32x32 and 64x64 walls, woodland and village scenery from additional OpenAI-generated source images under human direction, deterministically sampled with seamless wall edges and transparent vegetation. These scenery sheets have the same separate asset terms. Floors retain coloured glyphs; no AI runs during play.
 source:ASSET-LICENSE.md; lib/art/NOTICE.md; lib/tiles/NOTICE.md; lib/sounds/ammerow/NOTICE.md
 end:
 

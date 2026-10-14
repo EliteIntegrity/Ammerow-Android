@@ -122,6 +122,14 @@ static int test_overlay_stores_recipe_metadata(void *unused)
 	ptreq(stored->recipe, &floor_recipe);
 	eq(stored->codepoint, L'.');
 	require(!sdl3_terrain_overlay_set(&overlay, 17, 9, &variant));
+	variant.ascii_terrain = SDL3_ASCII_TERRAIN_WALL;
+	require(sdl3_terrain_overlay_set(&overlay, 17, 9, &variant));
+	eq(sdl3_terrain_overlay_get(&overlay, 17, 9)->ascii_terrain,
+		SDL3_ASCII_TERRAIN_WALL);
+	variant.full_tile_id = "village-masonry";
+	require(sdl3_terrain_overlay_set(&overlay, 17, 9, &variant));
+	ptreq(sdl3_terrain_overlay_get(&overlay, 17, 9)->full_tile_id,
+		variant.full_tile_id);
 	variant.foreground = COLOUR_WHITE;
 	require(sdl3_terrain_overlay_set(&overlay, 17, 9, &variant));
 	variant.tile_overlay_key = "feature:cave-rope-middle";
@@ -130,6 +138,8 @@ static int test_overlay_stores_recipe_metadata(void *unused)
 	require(sdl3_terrain_variant(&floor_recipe, LIGHTING_LOS, L'.',
 		COLOUR_SLATE, SDL3_TERRAIN_NATURAL, &variant));
 	require(!variant.tile_overlay_key);
+	require(!variant.full_tile_id);
+	eq(variant.ascii_terrain, SDL3_ASCII_TERRAIN_NORMAL);
 	eq(variant.tile_glyph_policy, SDL3_TILE_GLYPH_AUTO);
 	require(sdl3_terrain_overlay_set(&overlay, 17, 9, NULL));
 	null(sdl3_terrain_overlay_get(&overlay, 17, 9));

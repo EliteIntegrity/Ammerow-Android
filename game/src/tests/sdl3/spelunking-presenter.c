@@ -157,10 +157,12 @@ static int test_zoom_changes_only_map_source_density(void *unused)
 		view.focus_row + 1);
 	notnull(variant);
 	require(variant->in_view);
+	eq(variant->ascii_terrain, SDL3_ASCII_TERRAIN_WALL);
 	variant = sdl3_terrain_overlay_get(view.terrain, view.focus_col + 2,
 		view.focus_row);
 	notnull(variant);
 	require(variant->in_view);
+	eq(variant->ascii_terrain, SDL3_ASCII_TERRAIN_NORMAL);
 	variant = sdl3_terrain_overlay_get(view.terrain, view.focus_col,
 		view.focus_row - 8);
 	notnull(variant);
@@ -235,7 +237,7 @@ static int test_look_focus_drives_cursor_without_moving_player(void *unused)
 	player_y = f.runtime->state.y;
 	require(sdl3_spelunking_presenter_configure_focus(&presenter, NULL,
 		f.runtime,
-		0, 0, 20, 10, 200, player_x + 2, player_y, true, &view));
+		0, 0, 20, 10, 200, player_x + 2, player_y, true, 0, 0, &view));
 	eq(view.cursor_col, view.focus_col);
 	eq(view.cursor_row, view.focus_row);
 	cell = sdl3_grid_cell(view.source, view.cursor_col, view.cursor_row);
@@ -365,7 +367,28 @@ static int test_tile_adjacency_uses_only_explored_geometry(void *unused)
 }
 
 const char *suite_name = "sdl3/spelunking-presenter";
+static int test_square_source_extent(void *unused)
+{
+	struct fixture f;
+	struct sdl3_spelunking_presenter presenter = {0};
+	struct sdl3_map_view view;
+	(void)unused;
+	require(fixture_open(&f));
+	require(sdl3_spelunking_presenter_configure_focus(&presenter, NULL, f.runtime,
+		0, 0, 20, 10, 200, -1, -1, false, 9, 9, &view));
+	eq(view.cols, 20);
+	eq(view.rows, 10);
+	eq(view.source_cols, 9);
+	eq(view.source_rows, 9);
+	eq(view.dungeon_col + view.focus_col, f.runtime->state.x);
+	eq(view.dungeon_row + view.focus_row, f.runtime->state.y);
+	sdl3_spelunking_presenter_free(&presenter);
+	fixture_close(&f);
+	ok;
+}
+
 struct test tests[] = {
+	{ "square source extent keeps viewport and player focus", test_square_source_extent },
 	{ "tile occupant priority and unidentified objects", test_tile_subject_priority_and_unknown_objects },
 	{ "tile adjacency reveals no unexplored geometry", test_tile_adjacency_uses_only_explored_geometry },
 	{ "zoom changes only map source density",

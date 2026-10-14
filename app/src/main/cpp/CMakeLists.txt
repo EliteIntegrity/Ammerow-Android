@@ -148,6 +148,8 @@ target_link_options(main PRIVATE
 target_compile_definitions(main PRIVATE $<$<CONFIG:Debug>:AMMEROW_LAYOUT_PROBE>)
 target_link_options(main PRIVATE
     $<$<CONFIG:Debug>:-Wl,--wrap=sdl3_font_draw>
+    $<$<CONFIG:Debug>:-Wl,--wrap=sdl3_font_draw_square>
+    $<$<CONFIG:Debug>:-Wl,--wrap=sdl3_font_draw_square_wall>
     $<$<CONFIG:Debug>:-Wl,--wrap=sdl3_visual_render>
     $<$<CONFIG:Debug>:-Wl,--wrap=SDL_SetRenderTarget>
     $<$<CONFIG:Debug>:-Wl,--wrap=SDL_SetRenderClipRect>

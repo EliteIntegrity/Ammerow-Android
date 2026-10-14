@@ -15,13 +15,16 @@ Settings
 Menu, then Settings.  The pages are:
 
   Appearance              theme, map font, ASCII treatment, and the map
-                          presentation: ASCII, or Hybrid, which draws
+                          presentation: ASCII; Hybrid, which draws
                           monsters and some items as portrait sprites
-                          over ordinary ASCII terrain, at 32 x 32 or
-                          64 x 64 detail (a glyph stands in wherever
-                          there is no sprite).  Detail does not change
+                          over ASCII terrain; or Full Tile, which adds
+                          solid walls and woodland and keeps quiet glyph
+                          floors.  Hybrid and Full Tile come at 32 x 32
+                          or 64 x 64 detail (a glyph stands in wherever
+                          there is no picture).  Detail does not change
                           the map's scale; cards and shopkeepers stay
-                          coloured ASCII.
+                          coloured ASCII.  The ASCII grid is Square or
+                          Classic (see below).
   Interface               the menu and message font, interface size,
                           the statistics and message overlays, and where
                           recent messages appear (top right unless you
@@ -39,6 +42,13 @@ Tap a setting to change it.  Each tap moves it on, and past the last
 choice it comes back round to the first, so a tap can always undo a
 change.  Where the d-pad shows, its left and right step a setting back
 and forward.  Back returns to the list of pages.
+
+The ASCII grid is Square unless you choose Classic: square cells about
+the size of the text's, glyphs centred, so the map shows fewer columns
+and more rows at the same zoom (pinch to taste).  It changes only the
+map, caves included, not menus or cards.  With Square, Enhanced Square
+(below it, off unless chosen) widens wall and masonry glyphs by a fifth.
+Hybrid and Full Tile always use square cells of their own.
 
 Interface size sets how large the text is.  On a phone it starts at
 Comfortable.  Larger text leaves less room beside the d-pad: the sidebar

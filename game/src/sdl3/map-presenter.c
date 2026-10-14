@@ -309,7 +309,8 @@ static bool populate_expanded_map(struct sdl3_map_presenter *presenter,
 		struct sdl3_grid *grid, struct sdl3_map_view *view,
 		const term *main_term, int focus_col, int focus_row,
 		bool cursor_available, int cursor_col, int cursor_row,
-		enum sdl3_terrain_style terrain_style, int output_cols)
+		enum sdl3_terrain_style terrain_style,
+		const struct sdl3_map_presenter_options *options)
 {
 	int cols;
 	int rows;
@@ -327,9 +328,17 @@ static bool populate_expanded_map(struct sdl3_map_presenter *presenter,
 	}
 	/* Enough for the whole output, which the camera draws the map across. */
 	cols = MIN(cave->width, sdl3_zoom_visible_cells(MAX(view->cols,
-		output_cols), view->zoom_percent));
+		options->output_cols), view->zoom_percent));
 	rows = MIN(cave->height,
 		sdl3_zoom_visible_cells(view->rows, view->zoom_percent));
+	if (view->ascii_square && options->cell_width > 0 && options->cell_height > 0) {
+		int side = sdl3_zoom_square_size(options->cell_width,
+			options->cell_height, view->zoom_percent);
+		cols = MIN(cave->width, sdl3_zoom_square_visible_cells(
+			MAX(view->cols, options->output_cols), options->cell_width, side));
+		rows = MIN(cave->height, sdl3_zoom_square_visible_cells(view->rows,
+			options->cell_height, side));
+	}
 	if (cols <= 0 || rows <= 0) return false;
 	resized = !presenter->expanded_map.cells ||
 		presenter->expanded_map.cols != cols ||
@@ -397,6 +406,10 @@ static bool populate_expanded_map(struct sdl3_map_presenter *presenter,
 					variant.tile_id = recipe && recipe->tile_id ? recipe->tile_id :
 						(data.f_idx > FEAT_NONE && data.f_idx < FEAT_MAX ?
 							f_info[data.f_idx].art_id : NULL);
+					variant.full_tile_id = sdl3_terrain_full_tile_for_grid(cave,
+						player->cave, loc(first_col + col, first_row + row), data.f_idx);
+					variant.ascii_terrain = sdl3_terrain_ascii_kind(&data,
+						variant.full_tile_id);
 					variant.present = true;
 					replacement = &variant;
 				}
@@ -516,6 +529,10 @@ static void configure_terrain_overlay(struct sdl3_map_presenter *presenter,
 				variant.tile_id = recipe && recipe->tile_id ? recipe->tile_id :
 					(data.f_idx > FEAT_NONE && data.f_idx < FEAT_MAX ?
 						f_info[data.f_idx].art_id : NULL);
+				variant.full_tile_id = sdl3_terrain_full_tile_for_grid(cave,
+					player->cave, loc(dungeon_col, dungeon_row), data.f_idx);
+				variant.ascii_terrain = sdl3_terrain_ascii_kind(&data,
+					variant.full_tile_id);
 				variant.present = true;
 				replacement = &variant;
 			}
@@ -592,6 +609,8 @@ void sdl3_map_presenter_configure(struct sdl3_map_presenter *presenter,
 	memset(view, 0, sizeof(*view));
 	view->zoom_percent = options->zoom_percent;
 	view->tile_mode = options->tile_mode;
+	view->ascii_square = options->ascii_square && !options->tile_mode;
+	view->ascii_enhanced = view->ascii_square && options->ascii_enhanced;
 	if (!main_term || !pane) goto finish;
 	sidebar = main_term->sidebar_mode;
 	if (sidebar < 0 || sidebar >= SIDEBAR_MAX) goto finish;
@@ -609,6 +628,14 @@ void sdl3_map_presenter_configure(struct sdl3_map_presenter *presenter,
 		int term_rows = sidebar == SIDEBAR_TOP ?
 			main_term->hgt - row_top_map[sidebar] :
 			status_row - row_top_map[sidebar];
+		int source_cols = 0, source_rows = 0;
+		if (view->ascii_square && options->cell_width > 0 && options->cell_height > 0) {
+			int side = sdl3_zoom_square_size(options->cell_width,
+				options->cell_height, options->zoom_percent);
+			source_cols = sdl3_zoom_square_visible_cells(pane->cols, options->cell_width, side);
+			source_rows = sdl3_zoom_square_visible_cells(
+				MAX(1, pane->rows - SDL3_LAYOUT_CAVE_STATUS_ROWS), options->cell_height, side);
+		}
 
 		side_view_look = textui_spelunking_look_location(player,
 			&side_view_look_x, &side_view_look_y);
@@ -617,8 +644,10 @@ void sdl3_map_presenter_configure(struct sdl3_map_presenter *presenter,
 				pane->col, pane->row, pane->cols,
 				MAX(1, pane->rows - SDL3_LAYOUT_CAVE_STATUS_ROWS),
 				options->zoom_percent, side_view_look_x,
-				side_view_look_y, side_view_look, view)) {
+				side_view_look_y, side_view_look, source_cols, source_rows, view)) {
 			view->tile_mode = options->tile_mode;
+			view->ascii_square = options->ascii_square && !options->tile_mode;
+			view->ascii_enhanced = view->ascii_square && options->ascii_enhanced;
 			view->term_col = term_col;
 			view->term_row = term_row;
 			view->term_cols = term_cols;
@@ -721,7 +750,7 @@ void sdl3_map_presenter_configure(struct sdl3_map_presenter *presenter,
 	if (!populate_expanded_map(presenter, grid, view, main_term,
 				focus_dungeon_col, focus_dungeon_row, cursor_available,
 				cursor_dungeon_col, cursor_dungeon_row,
-				options->terrain_style, options->output_cols)) {
+				options->terrain_style, options)) {
 		/* Allocation failure must leave the authoritative map readable. */
 		view->zoom_percent = SDL3_ZOOM_DEFAULT;
 		view->col = view->term_col;

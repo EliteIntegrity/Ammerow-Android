@@ -179,6 +179,29 @@ static bool probing(void)
 	return recording && probe_visual && !in_glyph;
 }
 
+/* A glyph of the map: '@' and shop numbers are marked where they are drawn. */
+static void note_map_glyph(uint32_t codepoint, float cell_x, float cell_y,
+	float cell_width, float cell_height)
+{
+	const struct sdl3_visual *v = probe_visual;
+	bool zoom = current_target && current_target == v->zoom_out_texture;
+	bool grid = current_target && current_target == v->grid_texture;
+
+	stat_map_glyphs++;
+	trace_event('m');
+	if ((codepoint == '@' || (codepoint >= '1' && codepoint <= '9')) &&
+			probe_mark_count < PROBE_MAX_MARKS) {
+		probe_marks[probe_mark_count].glyph = (char)codepoint;
+		probe_marks[probe_mark_count].space = zoom ? MARK_ZOOM :
+			grid ? MARK_GRID : MARK_SCREEN;
+		probe_marks[probe_mark_count].x = grid ? cell_x + v->origin_x : cell_x;
+		probe_marks[probe_mark_count].y = grid ? cell_y + v->origin_y : cell_y;
+		probe_marks[probe_mark_count].w = cell_width;
+		probe_marks[probe_mark_count].h = cell_height;
+		probe_mark_count++;
+	}
+}
+
 bool __real_sdl3_font_draw(struct sdl3_font *font, uint32_t codepoint,
 	SDL_Color color, float cell_x, float cell_y, float cell_width,
 	float cell_height);
@@ -211,19 +234,7 @@ bool __wrap_sdl3_font_draw(struct sdl3_font *font, uint32_t codepoint,
 			(clipped && codepoint == '@') || (in_map_area && grid);
 
 		if (map) {
-			stat_map_glyphs++;
-			trace_event('m');
-			if ((codepoint == '@' || (codepoint >= '1' && codepoint <= '9')) &&
-					probe_mark_count < PROBE_MAX_MARKS) {
-				probe_marks[probe_mark_count].glyph = (char)codepoint;
-				probe_marks[probe_mark_count].space = zoom ? MARK_ZOOM :
-					grid ? MARK_GRID : MARK_SCREEN;
-				probe_marks[probe_mark_count].x = grid ? cell_x + v->origin_x : cell_x;
-				probe_marks[probe_mark_count].y = grid ? cell_y + v->origin_y : cell_y;
-				probe_marks[probe_mark_count].w = cell_width;
-				probe_marks[probe_mark_count].h = cell_height;
-				probe_mark_count++;
-			}
+			note_map_glyph(codepoint, cell_x, cell_y, cell_width, cell_height);
 		} else if ((font == &v->font || font == &v->card_font) &&
 				v->cell_width > 0 && v->cell_height > 0) {
 			struct target *t = target_for(current_target, true);
@@ -241,6 +252,46 @@ bool __wrap_sdl3_font_draw(struct sdl3_font *font, uint32_t codepoint,
 	in_glyph++;
 	result = __real_sdl3_font_draw(font, codepoint, color, cell_x, cell_y,
 		cell_width, cell_height);
+	in_glyph--;
+	return result;
+}
+
+/* The square ASCII grid draws the map's glyphs through these instead
+ * (src/sdl3/font.c), each as its own texture: only map glyphs. */
+bool __real_sdl3_font_draw_square(struct sdl3_font *font, SDL_Renderer *renderer,
+	uint32_t codepoint, SDL_Color color, float cell_x, float cell_y,
+	float cell_width, float cell_height);
+bool __wrap_sdl3_font_draw_square(struct sdl3_font *font, SDL_Renderer *renderer,
+	uint32_t codepoint, SDL_Color color, float cell_x, float cell_y,
+	float cell_width, float cell_height)
+{
+	bool result;
+
+	if (probing() && codepoint > ' ') {
+		note_map_glyph(codepoint, cell_x, cell_y, cell_width, cell_height);
+	}
+	in_glyph++;
+	result = __real_sdl3_font_draw_square(font, renderer, codepoint, color,
+		cell_x, cell_y, cell_width, cell_height);
+	in_glyph--;
+	return result;
+}
+
+bool __real_sdl3_font_draw_square_wall(struct sdl3_font *font,
+	SDL_Renderer *renderer, uint32_t codepoint, SDL_Color color, float cell_x,
+	float cell_y, float cell_width, float cell_height);
+bool __wrap_sdl3_font_draw_square_wall(struct sdl3_font *font,
+	SDL_Renderer *renderer, uint32_t codepoint, SDL_Color color, float cell_x,
+	float cell_y, float cell_width, float cell_height)
+{
+	bool result;
+
+	if (probing() && codepoint > ' ') {
+		note_map_glyph(codepoint, cell_x, cell_y, cell_width, cell_height);
+	}
+	in_glyph++;
+	result = __real_sdl3_font_draw_square_wall(font, renderer, codepoint,
+		color, cell_x, cell_y, cell_width, cell_height);
 	in_glyph--;
 	return result;
 }
@@ -527,6 +578,8 @@ void __wrap_sdl3_visual_render(struct sdl3_visual *visual,
 }
 
 TOUCH_CHECK_WRAP(sdl3_font_draw);
+TOUCH_CHECK_WRAP(sdl3_font_draw_square);
+TOUCH_CHECK_WRAP(sdl3_font_draw_square_wall);
 TOUCH_CHECK_WRAP(sdl3_visual_render);
 TOUCH_CHECK_WRAP(SDL_SetRenderTarget);
 TOUCH_CHECK_WRAP(SDL_SetRenderClipRect);

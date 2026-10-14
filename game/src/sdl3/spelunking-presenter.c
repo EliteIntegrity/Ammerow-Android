@@ -125,7 +125,7 @@ bool sdl3_spelunking_presenter_configure(
 {
 	return sdl3_spelunking_presenter_configure_focus(presenter, system, runtime,
 		viewport_col, viewport_row, viewport_cols, viewport_rows,
-		zoom_percent, -1, -1, false, view);
+		zoom_percent, -1, -1, false, 0, 0, view);
 }
 
 bool sdl3_spelunking_presenter_configure_focus(
@@ -134,6 +134,7 @@ bool sdl3_spelunking_presenter_configure_focus(
 		const struct world_spelunk_runtime *runtime, int viewport_col,
 		int viewport_row, int viewport_cols, int viewport_rows,
 		int zoom_percent, int focus_x, int focus_y, bool cursor_visible,
+		int requested_source_cols, int requested_source_rows,
 		struct sdl3_map_view *view)
 {
 	struct world_spelunk_view snapshot;
@@ -152,6 +153,10 @@ bool sdl3_spelunking_presenter_configure_focus(
 		sdl3_zoom_visible_cells(viewport_cols, zoom_percent));
 	source_rows = MIN(runtime->state.map.height,
 		sdl3_zoom_visible_cells(viewport_rows, zoom_percent));
+	if (requested_source_cols > 0)
+		source_cols = MIN(runtime->state.map.width, requested_source_cols);
+	if (requested_source_rows > 0)
+		source_rows = MIN(runtime->state.map.height, requested_source_rows);
 	if (source_cols <= 0 || source_rows <= 0) return false;
 	if (!presenter->map.cells) {
 		if (!sdl3_grid_init(&presenter->map, source_cols, source_rows)) {
@@ -204,6 +209,18 @@ bool sdl3_spelunking_presenter_configure_focus(
 					map_y);
 			variant.present = true;
 			variant.active = true;
+			/* Use the winning snapshot cell, never the rock under an actor,
+			 * item, rope, piton, cursor or other navigation marker. */
+			switch (cell) {
+			case WORLD_SPELUNK_VIEW_ROCK:
+			case WORLD_SPELUNK_VIEW_REMEMBERED_ROCK:
+			case WORLD_SPELUNK_VIEW_ROCK_CALCITE:
+			case WORLD_SPELUNK_VIEW_ROCK_COPPER:
+			case WORLD_SPELUNK_VIEW_ROCK_IRON:
+				variant.ascii_terrain = SDL3_ASCII_TERRAIN_WALL;
+				break;
+			default: break;
+			}
 			tile_layers(runtime, &snapshot, col, row, &variant);
 			(void)sdl3_terrain_overlay_set(&presenter->terrain, col, row,
 				&variant);

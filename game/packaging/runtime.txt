@@ -20,6 +20,17 @@ data|lib/tiles/hybrid-64.txt|tiles/hybrid-64.txt
 data|lib/tiles/pixel-64-001.png|tiles/pixel-64-001.png
 data|lib/tiles/pixel-001-index.txt|tiles/pixel-001-index.txt
 # END GENERATED HYBRID TILE PAGES
+data|lib/tiles/full-32.txt|tiles/full-32.txt
+data|lib/tiles/full-64.txt|tiles/full-64.txt
+data|lib/tiles/terrain-index.txt|tiles/terrain-index.txt
+data|lib/tiles/terrain-32.png|tiles/terrain-32.png
+data|lib/tiles/terrain-64.png|tiles/terrain-64.png
+data|lib/tiles/vegetation-index.txt|tiles/vegetation-index.txt
+data|lib/tiles/vegetation-32.png|tiles/vegetation-32.png
+data|lib/tiles/vegetation-64.png|tiles/vegetation-64.png
+data|lib/tiles/village-index.txt|tiles/village-index.txt
+data|lib/tiles/village-32.png|tiles/village-32.png
+data|lib/tiles/village-64.png|tiles/village-64.png
 data|lib/gamedata/activation.txt|gamedata/activation.txt
 data|lib/gamedata/artifact.txt|gamedata/artifact.txt
 data|lib/gamedata/artifact_balance.txt|gamedata/artifact_balance.txt
