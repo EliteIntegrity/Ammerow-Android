@@ -70,6 +70,7 @@ struct sdl3_presentation_frame {
 	int hybrid_tile_size;
 	bool ascii_square;
 	bool ascii_enhanced;
+	bool ascii_floors;
 	enum sdl3_dock_placement dock_placement;
 	int dock_rows;
 	int dock_cols;

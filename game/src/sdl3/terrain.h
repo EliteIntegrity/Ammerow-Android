@@ -68,6 +68,8 @@ const struct terrain_visual_recipe *sdl3_terrain_recipe_for_grid(
 		struct chunk *c, struct loc grid, int feature);
 const char *sdl3_terrain_full_tile_for_grid(struct chunk *c,
 		struct chunk *known, struct loc grid, int exposed_feature);
+bool sdl3_terrain_plain_ground(const char *tile_id);
+const char *sdl3_terrain_underlay(const char *tile_id);
 enum sdl3_ascii_terrain sdl3_terrain_ascii_kind(const struct grid_data *data,
 		const char *full_tile_id);
 const char *sdl3_terrain_style_name(enum sdl3_terrain_style style);

@@ -16,15 +16,17 @@ Menu, then Settings.  The pages are:
 
   Appearance              theme, map font, ASCII treatment, and the map
                           presentation: ASCII; Hybrid, which draws
-                          monsters and some items as portrait sprites
-                          over ASCII terrain; or Full Tile, which adds
-                          solid walls and woodland and keeps quiet glyph
-                          floors.  Hybrid and Full Tile come at 32 x 32
-                          or 64 x 64 detail (a glyph stands in wherever
-                          there is no picture).  Detail does not change
-                          the map's scale; cards and shopkeepers stay
-                          coloured ASCII.  The ASCII grid is Square or
-                          Classic (see below).
+                          monsters and many items as sprites over ASCII
+                          terrain; or Full Tile, which also draws walls,
+                          woodland, doors, stairs, water and quiet
+                          ground (Keep floors ASCII, just below it,
+                          brings back glyph dots on black for plain
+                          ground only).  Hybrid and Full Tile come at
+                          32 x 32 or 64 x 64 detail (a glyph stands in
+                          wherever there is no picture).  Detail does
+                          not change the map's scale; cards and
+                          shopkeepers stay coloured ASCII.  The ASCII
+                          grid is Square or Classic (see below).
   Interface               the menu and message font, interface size,
                           the statistics and message overlays, and where
                           recent messages appear (top right unless you

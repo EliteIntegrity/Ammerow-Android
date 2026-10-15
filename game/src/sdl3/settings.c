@@ -46,7 +46,7 @@ static void draw_setting_row(const struct sdl3_settings_overlay *overlay,
 	int value_col = left + SDL_min(28, width / 2);
 	for (int i = 0; i < menu->count; i++) {
 		enum sdl3_settings_row candidate;
-		if (sdl3_settings_page_row_at(overlay->page, overlay->enhanced_available, i, &candidate) &&
+		if (sdl3_settings_page_row_at(overlay->page, sdl3_settings_appearance_mode(overlay), i, &candidate) &&
 				candidate == setting_row) row = sdl3_menu_item_row(menu, i);
 	}
 	if (row < 0) return;
@@ -66,7 +66,7 @@ static void draw_hub(const struct sdl3_settings_overlay *overlay,
 		const struct sdl3_theme *theme, int left, int width)
 {
 	struct sdl3_menu_layout menu = sdl3_settings_layout(SDL3_SETTINGS_HUB,
-		overlay->enhanced_available, visual->cols, visual->rows).menu;
+		sdl3_settings_appearance_mode(overlay), visual->cols, visual->rows).menu;
 	int i;
 
 	for (i = 0; i < SDL3_SETTINGS_HUB_ROW_COUNT; i++) {
@@ -102,7 +102,7 @@ static void draw_page(const struct sdl3_settings_overlay *overlay,
 		enum sdl3_terrain_style terrain_style,
 		enum sdl3_weather_mode weather_mode, bool fullscreen, bool dock_visible,
 		bool hud_stats_visible, bool big_stat_cards, bool animated_combat, bool edge_warnings,
-		enum sdl3_tile_mode tile_mode, int hybrid_tile_size, bool ascii_square, bool ascii_enhanced,
+		enum sdl3_tile_mode tile_mode, int hybrid_tile_size, bool ascii_square, bool ascii_enhanced, bool ascii_floors,
 		enum sdl3_dock_placement dock_placement, int dock_rows, int dock_cols,
 		const struct sdl3_audio_settings *audio,
 		const struct player_options *game_options, bool playing)
@@ -116,7 +116,7 @@ static void draw_page(const struct sdl3_settings_overlay *overlay,
 	char dock_size[24];
 	char zoom[24];
 	struct sdl3_settings_layout layout = sdl3_settings_layout(overlay->page,
-		overlay->enhanced_available, visual->cols, visual->rows);
+		sdl3_settings_appearance_mode(overlay), visual->cols, visual->rows);
 	const struct sdl3_menu_layout *menu = &layout.menu;
 
 	strnfmt(zoom, sizeof(zoom), "x%d.%02d", zoom_percent / 100,
@@ -187,11 +187,14 @@ static void draw_page(const struct sdl3_settings_overlay *overlay,
 		draw_setting_row(overlay, renderer, visual, theme, menu,
 			SDL3_SETTINGS_ASCII_ENHANCED, "  Enhanced Square",
 			ascii_enhanced ? "On" : "Off");
+		draw_setting_row(overlay, renderer, visual, theme, menu,
+			SDL3_SETTINGS_ASCII_FLOORS, "  Keep floors ASCII",
+			ascii_floors ? "On" : "Off");
 		sdl3_ui_draw_text(visual,
 			overlay->selected_row == SDL3_SETTINGS_ASCII_ENHANCED ?
 			"Widen wall glyphs by 20%; other glyphs stay unchanged." :
 			tile_mode == SDL3_TILE_MODE_FULL ?
-			"Full Tile: walls, woodland and sprites; quiet glyph floors." :
+			"ASCII floors: ground only. Water and features stay tiled." :
 			tile_mode == SDL3_TILE_MODE_HYBRID ?
 			"Hybrid: sprites on ASCII terrain. ASCII grid applies in ASCII mode." :
 			"Classic uses rectangular cells; Square keeps similar cell area.",
@@ -266,7 +269,7 @@ void sdl3_settings_draw(const struct sdl3_settings_overlay *overlay,
 		int zoom_percent, enum sdl3_terrain_style terrain_style,
 		enum sdl3_weather_mode weather_mode, bool fullscreen,
 		bool dock_visible, bool hud_stats_visible, bool big_stat_cards,
-		bool animated_combat, bool edge_warnings, enum sdl3_tile_mode tile_mode, int hybrid_tile_size, bool ascii_square, bool ascii_enhanced,
+		bool animated_combat, bool edge_warnings, enum sdl3_tile_mode tile_mode, int hybrid_tile_size, bool ascii_square, bool ascii_enhanced, bool ascii_floors,
 		enum sdl3_dock_placement dock_placement, int dock_rows, int dock_cols,
 		const struct sdl3_audio_settings *audio,
 		const struct player_options *game_options, bool playing)
@@ -280,7 +283,7 @@ void sdl3_settings_draw(const struct sdl3_settings_overlay *overlay,
 	}
 	sdl3_ui_fill_output(renderer, visual,
 		(SDL_Color){ 0, 0, 0, SDL_ALPHA_OPAQUE });
-	layout = sdl3_settings_layout(overlay->page, overlay->enhanced_available,
+	layout = sdl3_settings_layout(overlay->page, sdl3_settings_appearance_mode(overlay),
 		visual->cols, visual->rows);
 	width = layout.menu.width;
 	left = layout.menu.col;
@@ -297,7 +300,7 @@ void sdl3_settings_draw(const struct sdl3_settings_overlay *overlay,
 		draw_page(overlay, renderer, visual, theme, left, width,
 			interface_font_name, map_font_name, interface_density,
 			zoom_percent, terrain_style, weather_mode, fullscreen, dock_visible,
-			hud_stats_visible, big_stat_cards, animated_combat, edge_warnings, tile_mode, hybrid_tile_size, ascii_square, ascii_enhanced,
+			hud_stats_visible, big_stat_cards, animated_combat, edge_warnings, tile_mode, hybrid_tile_size, ascii_square, ascii_enhanced, ascii_floors,
 			dock_placement,
 			dock_rows, dock_cols, audio, game_options, playing);
 		sdl3_ui_draw_text(visual,

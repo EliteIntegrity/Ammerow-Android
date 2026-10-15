@@ -40,6 +40,7 @@ static void set_defaults(struct sdl3_config *config)
 	config->tile_mode = false;
 	config->ascii_square = true;
 	config->ascii_enhanced = false;
+	config->ascii_floors = false;
 	config->hybrid_tile_size = 64;
 	config->terrain_style = SDL3_TERRAIN_NATURAL;
 	config->weather_mode = SDL3_WEATHER_AUTO;
@@ -100,6 +101,7 @@ bool sdl3_config_load(struct sdl3_config *config)
 	int line_number = 0;
 	int version = 0;
 	bool saw_version = false;
+	bool saw_ascii_floors = false;
 
 	if (!config || !config->file_path[0]) return false;
 	file = file_open(config->file_path, MODE_READ, FTYPE_TEXT);
@@ -247,6 +249,14 @@ bool sdl3_config_load(struct sdl3_config *config)
 				SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
 					"Ignoring invalid SDL3 tile-mode setting on line %d",
 					line_number);
+			}
+		} else if (streq(key, "ascii_floors")) {
+			if (parse_integer(value, 0, 1, &parsed)) {
+				candidate.ascii_floors = parsed != 0;
+				saw_ascii_floors = true;
+			} else {
+				SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+					"Ignoring invalid ASCII floors setting: %s", value);
 			}
 		} else if (streq(key, "ascii_enhanced")) {
 			if (parse_integer(value, 0, 1, &parsed))
@@ -456,6 +466,9 @@ bool sdl3_config_load(struct sdl3_config *config)
 		candidate.dock_placement = SDL3_DOCK_BOTTOM;
 	}
 	*config = candidate;
+	/* Existing Full Tile users keep the former glyph-ground presentation. */
+	if (version < 27 && !saw_ascii_floors &&
+			config->tile_mode == SDL3_TILE_MODE_FULL) config->ascii_floors = true;
 	return true;
 }
 
@@ -513,6 +526,7 @@ bool sdl3_config_save(const struct sdl3_config *config)
 		file_putf(file, "hybrid_tile_size=%d\n", config->hybrid_tile_size) &&
 		file_putf(file, "ascii_square=%d\n", config->ascii_square ? 1 : 0) &&
 		file_putf(file, "ascii_enhanced=%d\n", config->ascii_enhanced ? 1 : 0) &&
+		file_putf(file, "ascii_floors=%d\n", config->ascii_floors ? 1 : 0) &&
 		file_putf(file, "terrain_style=%d\n",
 			(int)config->terrain_style) &&
 		file_putf(file, "weather_mode=%d\n",

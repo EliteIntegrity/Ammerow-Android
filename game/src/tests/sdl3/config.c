@@ -735,7 +735,41 @@ static int test_enhanced_square(void *state)
 	ok;
 }
 
+static int test_ascii_floors(void *state)
+{
+	struct sdl3_config config;
+	(void)state;
+	prepare_config(&config);
+	require(!config.ascii_floors);
+	/* Existing Full Tile users keep the glyph floors they selected. */
+	require(write_test_config("version=26\ntile_mode=2\n"));
+	require(sdl3_config_load(&config));
+	require(config.ascii_floors);
+	config.ascii_floors = false;
+	require(sdl3_config_save(&config));
+	prepare_config(&config);
+	require(sdl3_config_load(&config));
+	require(!config.ascii_floors);
+	/* The hidden preference survives switching presentation modes. */
+	config.tile_mode = SDL3_TILE_MODE_HYBRID;
+	config.ascii_floors = true;
+	require(sdl3_config_save(&config));
+	prepare_config(&config);
+	require(sdl3_config_load(&config));
+	require(config.ascii_floors);
+	require(write_test_config("version=27\nascii_floors=2\n"));
+	prepare_config(&config);
+	require(sdl3_config_load(&config));
+	require(!config.ascii_floors);
+	require(write_test_config("version=26\ntile_mode=1\n"));
+	prepare_config(&config);
+	require(sdl3_config_load(&config));
+	require(!config.ascii_floors);
+	ok;
+}
+
 struct test tests[] = {
+	{ "ASCII floors default, migration and persistence", test_ascii_floors },
 	{ "Enhanced Square default and persistence", test_enhanced_square },
 	{ "ASCII grid defaults, validation and persistence", test_ascii_grid },
 	{ "fullscreen default and saved choice",

@@ -147,8 +147,32 @@ static int test_overlay_stores_recipe_metadata(void *unused)
 	ok;
 }
 
+static int test_ground_and_underlay(void *unused)
+{
+	(void)unused;
+	require(sdl3_terrain_plain_ground("open-floor"));
+	require(sdl3_terrain_plain_ground("meridian-floor"));
+	require(sdl3_terrain_plain_ground("patch-of-grass"));
+	require(sdl3_terrain_plain_ground("dirt"));
+	require(!sdl3_terrain_plain_ground(NULL));
+	require(!sdl3_terrain_plain_ground("cave-air"));
+	require(!sdl3_terrain_plain_ground("cave-water"));
+	require(!sdl3_terrain_plain_ground("shallow-water"));
+	require(!sdl3_terrain_plain_ground("lava"));
+	require(!sdl3_terrain_plain_ground("dark-pit"));
+	require(!sdl3_terrain_plain_ground("down-staircase"));
+	require(streq(sdl3_terrain_underlay("door"), "open-floor"));
+	require(streq(sdl3_terrain_underlay("tree"), "patch-of-grass"));
+	null(sdl3_terrain_underlay("cave-air"));
+	null(sdl3_terrain_underlay("cave-rope-middle"));
+	null(sdl3_terrain_underlay("shallow-water"));
+	null(sdl3_terrain_underlay(NULL));
+	ok;
+}
+
 const char *suite_name = "sdl3/terrain";
 struct test tests[] = {
+	{ "ground excludes hazards and cave air", test_ground_and_underlay },
 	{ "level key stability", test_level_key_is_stable_and_sensitive },
 	{ "natural style", test_natural_resolves_material },
 	{ "classic and missing recipe", test_classic_and_missing_recipes_fail_closed },

@@ -53,6 +53,33 @@ static const enum sdl3_settings_row sound_rows[] = {
 	SDL3_SETTINGS_AUDIO_AMBIENT
 };
 
+static const enum sdl3_settings_row full_appearance_rows[] = {
+	SDL3_SETTINGS_THEME,
+	SDL3_SETTINGS_MAP_FONT,
+	SDL3_SETTINGS_TILE_MODE,
+	SDL3_SETTINGS_ASCII_FLOORS,
+	SDL3_SETTINGS_HYBRID_DETAIL,
+	SDL3_SETTINGS_ASCII_GRID,
+	SDL3_SETTINGS_TERRAIN
+};
+
+enum sdl3_settings_appearance sdl3_settings_appearance_mode(
+		const struct sdl3_settings_overlay *overlay)
+{
+	if (overlay && overlay->floors_available) return SDL3_SETTINGS_APPEARANCE_FULL;
+	if (overlay && overlay->enhanced_available) return SDL3_SETTINGS_APPEARANCE_ENHANCED;
+	return SDL3_SETTINGS_APPEARANCE_BASIC;
+}
+
+void sdl3_settings_set_floors_available(struct sdl3_settings_overlay *overlay,
+		bool available)
+{
+	if (!overlay) return;
+	overlay->floors_available = available;
+	if (!available && overlay->selected_row == SDL3_SETTINGS_ASCII_FLOORS)
+		overlay->selected_row = SDL3_SETTINGS_TILE_MODE;
+}
+
 static const enum sdl3_settings_row display_rows[] = {
 	SDL3_SETTINGS_FULLSCREEN,
 	SDL3_SETTINGS_ZOOM,
@@ -72,11 +99,15 @@ static const enum sdl3_settings_row controls_rows[] = {
 };
 
 static const enum sdl3_settings_row *page_rows(
-		enum sdl3_settings_page page, bool enhanced, int *count)
+		enum sdl3_settings_page page, enum sdl3_settings_appearance appearance, int *count)
 {
 	switch (page) {
 	case SDL3_SETTINGS_APPEARANCE:
-		if (enhanced) {
+		if (appearance == SDL3_SETTINGS_APPEARANCE_FULL) {
+			*count = (int)(sizeof(full_appearance_rows) / sizeof(full_appearance_rows[0]));
+			return full_appearance_rows;
+		}
+		if (appearance == SDL3_SETTINGS_APPEARANCE_ENHANCED) {
 			*count = (int)(sizeof(enhanced_appearance_rows) /
 				sizeof(enhanced_appearance_rows[0]));
 			return enhanced_appearance_rows;
@@ -101,22 +132,24 @@ static const enum sdl3_settings_row *page_rows(
 	}
 }
 
-int sdl3_settings_page_row_count(enum sdl3_settings_page page, bool enhanced)
+int sdl3_settings_page_row_count(enum sdl3_settings_page page,
+		enum sdl3_settings_appearance appearance)
 {
 	int count;
 
-	(void)page_rows(page, enhanced, &count);
+	(void)page_rows(page, appearance, &count);
 	return count;
 }
 
-bool sdl3_settings_page_row_at(enum sdl3_settings_page page, bool enhanced, int index,
+bool sdl3_settings_page_row_at(enum sdl3_settings_page page,
+		enum sdl3_settings_appearance appearance, int index,
 		enum sdl3_settings_row *row)
 {
 	const enum sdl3_settings_row *rows;
 	int count;
 
 	if (!row) return false;
-	rows = page_rows(page, enhanced, &count);
+	rows = page_rows(page, appearance, &count);
 	if (!rows || index < 0 || index >= count) return false;
 	*row = rows[index];
 	return true;
@@ -127,12 +160,13 @@ static void select_first_page_row(struct sdl3_settings_overlay *overlay)
 	const enum sdl3_settings_row *rows;
 	int count;
 
-	rows = page_rows(overlay->page, overlay->enhanced_available, &count);
+	rows = page_rows(overlay->page, sdl3_settings_appearance_mode(overlay), &count);
 	if (rows && count > 0) overlay->selected_row = rows[0];
 }
 
 struct sdl3_settings_layout sdl3_settings_layout(
-		enum sdl3_settings_page page, bool enhanced, int cols, int rows)
+		enum sdl3_settings_page page, enum sdl3_settings_appearance appearance,
+		int cols, int rows)
 {
 	struct sdl3_settings_layout result = { 0 };
 	struct sdl3_menu_layout *menu = &result.menu;
@@ -140,7 +174,7 @@ struct sdl3_settings_layout sdl3_settings_layout(
 	menu->width = cols - 8 < 88 ? cols - 8 : 88;
 	menu->col = (cols - menu->width) / 2;
 	menu->row = 9;
-	menu->count = sdl3_settings_page_row_count(page, enhanced);
+	menu->count = sdl3_settings_page_row_count(page, appearance);
 	menu->step = 2;
 	menu->item_height = 1;
 	result.footer_row = rows - 3;
@@ -173,14 +207,14 @@ bool sdl3_settings_select_at(struct sdl3_settings_overlay *overlay, int cols,
 	enum sdl3_settings_row setting_row;
 	int item;
 	if (!overlay) return false;
-	layout = sdl3_settings_layout(overlay->page, overlay->enhanced_available, cols, rows);
+	layout = sdl3_settings_layout(overlay->page, sdl3_settings_appearance_mode(overlay), cols, rows);
 	item = sdl3_menu_item_at(&layout.menu, col, row);
 	if (item < 0) return false;
 	if (overlay->page == SDL3_SETTINGS_HUB) {
 		overlay->selected_hub_row = item;
 	} else {
 		if (!sdl3_settings_page_row_at(overlay->page,
-				overlay->enhanced_available, item, &setting_row))
+				sdl3_settings_appearance_mode(overlay), item, &setting_row))
 			return false;
 		overlay->selected_row = setting_row;
 	}
@@ -238,7 +272,7 @@ void sdl3_settings_move(struct sdl3_settings_overlay *overlay, int delta)
 		}
 		return;
 	}
-	rows = page_rows(overlay->page, overlay->enhanced_available, &count);
+	rows = page_rows(overlay->page, sdl3_settings_appearance_mode(overlay), &count);
 	if (!rows || count <= 0) return;
 	for (index = 0; index < count; index++) {
 		if (rows[index] == overlay->selected_row) break;

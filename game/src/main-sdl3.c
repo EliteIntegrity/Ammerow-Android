@@ -458,6 +458,9 @@ void sdl3_frontend_render(struct sdl3_app *app)
 	frame.hybrid_tile_size = app->config.hybrid_tile_size;
 	frame.ascii_square = app->config.ascii_square;
 	frame.ascii_enhanced = app->config.ascii_enhanced;
+	frame.ascii_floors = app->config.ascii_floors;
+	sdl3_settings_set_floors_available(&app->settings,
+		app->config.tile_mode == SDL3_TILE_MODE_FULL);
 	sdl3_settings_set_enhanced_available(&app->settings,
 		app->config.ascii_square && app->config.tile_mode == SDL3_TILE_MODE_ASCII);
 	frame.dock_placement = app->config.dock_placement;
@@ -1643,8 +1646,9 @@ bool sdl3_capture_settings(const char *action)
 		sdl3_frontend_change_selected_setting(&g_app, 1);
 	} else if (streq(action, "map") || streq(action, "detail") ||
 			streq(action, "warnings") || streq(action, "grid") ||
-			streq(action, "enhanced")) {
-		g_app.settings.selected_row = streq(action, "enhanced") ?
+			streq(action, "enhanced") || streq(action, "floors")) {
+		g_app.settings.selected_row = streq(action, "floors") ?
+			SDL3_SETTINGS_ASCII_FLOORS : streq(action, "enhanced") ?
 			SDL3_SETTINGS_ASCII_ENHANCED : streq(action, "grid") ?
 			SDL3_SETTINGS_ASCII_GRID : streq(action, "warnings") ?
 			SDL3_SETTINGS_EDGE_WARNINGS : streq(action, "map") ?

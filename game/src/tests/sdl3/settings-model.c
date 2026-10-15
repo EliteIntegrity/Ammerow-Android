@@ -242,7 +242,46 @@ static int test_enhanced_square_row(void *state)
 	ok;
 }
 
+static int test_ascii_floors_row(void *state)
+{
+	struct sdl3_settings_overlay overlay;
+	(void)state;
+	sdl3_settings_init(&overlay);
+	overlay.page = SDL3_SETTINGS_APPEARANCE;
+	overlay.selected_row = SDL3_SETTINGS_TILE_MODE;
+	sdl3_settings_set_floors_available(&overlay, true);
+	eq(sdl3_settings_appearance_mode(&overlay), SDL3_SETTINGS_APPEARANCE_FULL);
+	sdl3_settings_move(&overlay, 1);
+	eq(overlay.selected_row, SDL3_SETTINGS_ASCII_FLOORS);
+	sdl3_settings_move(&overlay, 1);
+	eq(overlay.selected_row, SDL3_SETTINGS_HYBRID_DETAIL);
+	sdl3_settings_move(&overlay, -1);
+	eq(overlay.selected_row, SDL3_SETTINGS_ASCII_FLOORS);
+	for (int size = 0; size < 4; size++) {
+		int cols = 80 + size * 20, rows = 24 + size * 6;
+		struct sdl3_settings_layout layout = sdl3_settings_layout(
+			overlay.page, SDL3_SETTINGS_APPEARANCE_FULL, cols, rows);
+		eq(layout.menu.count, 7);
+		require(layout.note_row + layout.note_rows < layout.footer_row);
+		for (int i = 0; i < layout.menu.count; i++) {
+			enum sdl3_settings_row expected;
+			require(sdl3_settings_page_row_at(overlay.page,
+				SDL3_SETTINGS_APPEARANCE_FULL, i, &expected));
+			require(sdl3_settings_select_at(&overlay, cols, rows,
+				layout.menu.col + 4, sdl3_menu_item_row(&layout.menu, i)));
+			eq(overlay.selected_row, expected);
+		}
+	}
+	overlay.selected_row = SDL3_SETTINGS_ASCII_FLOORS;
+	sdl3_settings_set_floors_available(&overlay, false);
+	eq(overlay.selected_row, SDL3_SETTINGS_TILE_MODE);
+	sdl3_settings_move(&overlay, 1);
+	eq(overlay.selected_row, SDL3_SETTINGS_HYBRID_DETAIL);
+	ok;
+}
+
 struct test tests[] = {
+	{ "conditional ASCII floors navigation and layout", test_ascii_floors_row },
 	{ "conditional Enhanced Square navigation and layout", test_enhanced_square_row },
 	{ "all settings pages fit and hit-test at every density", test_all_pages_fit_and_hit_test },
 	{ "open and toggle", test_open_and_toggle },

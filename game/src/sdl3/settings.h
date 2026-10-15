@@ -34,7 +34,7 @@ void sdl3_settings_draw(const struct sdl3_settings_overlay *overlay,
 		int zoom_percent, enum sdl3_terrain_style terrain_style,
 		enum sdl3_weather_mode weather_mode, bool fullscreen,
 		bool dock_visible, bool hud_stats_visible, bool big_stat_cards,
-		bool animated_combat, bool edge_warnings, enum sdl3_tile_mode tile_mode, int hybrid_tile_size, bool ascii_square, bool ascii_enhanced,
+		bool animated_combat, bool edge_warnings, enum sdl3_tile_mode tile_mode, int hybrid_tile_size, bool ascii_square, bool ascii_enhanced, bool ascii_floors,
 		enum sdl3_dock_placement dock_placement, int dock_rows, int dock_cols,
 		const struct sdl3_audio_settings *audio,
 		const struct player_options *game_options, bool playing);

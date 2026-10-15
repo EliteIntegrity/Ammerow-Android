@@ -322,6 +322,12 @@ void sdl3_frontend_change_selected_setting(struct sdl3_app *app, int delta)
 		sdl3_presenter_invalidate_grid_cache(app->presenter);
 		sdl3_grid_mark_all_dirty(&app->grid);
 		break;
+	case SDL3_SETTINGS_ASCII_FLOORS:
+		if (app->config.tile_mode != SDL3_TILE_MODE_FULL) break;
+		app->config.ascii_floors = !app->config.ascii_floors;
+		sdl3_presenter_invalidate_grid_cache(app->presenter);
+		sdl3_grid_mark_all_dirty(&app->grid);
+		break;
 	case SDL3_SETTINGS_ASCII_GRID:
 		app->config.ascii_square = !app->config.ascii_square;
 		sdl3_presenter_invalidate_grid_cache(app->presenter);

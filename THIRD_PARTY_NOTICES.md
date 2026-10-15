@@ -90,10 +90,11 @@ fallback; their complete notices are in
 ## Ammerow artwork and audio
 
 Official APKs also contain Ammerow's compiled ASCII-art plates, its 32x32 and
-64x64 Hybrid sprite sheets and Full Tile scenery sheets (walls, woodland and
-village stonework), its sound effects and Home theme (converted to Ogg
-Vorbis for Android) and the official launcher icon. These are Ammerow's own
-assets, separately licensed under `ASSET-LICENSE.md`, not third-party
-components and not under the GPL; they are not in this repository. Their
-attribution and production notices are in `game/lib/art/NOTICE.md`,
+64x64 Hybrid sprite sheets, its Full Tile scenery sheets (walls, woodland,
+village stonework, ground and dungeon features) and pickup sheets (equipment,
+ammunition, gold, books and supplies), its sound effects and Home theme
+(converted to Ogg Vorbis for Android) and the official launcher icon. These
+are Ammerow's own assets, separately licensed under `ASSET-LICENSE.md`, not
+third-party components and not under the GPL; they are not in this repository.
+Their attribution and production notices are in `game/lib/art/NOTICE.md`,
 `game/lib/tiles/NOTICE.md` and `game/lib/sounds/ammerow/NOTICE.md`.

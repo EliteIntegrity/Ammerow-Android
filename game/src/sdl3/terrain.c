@@ -96,6 +96,39 @@ const char *sdl3_terrain_full_tile_for_grid(struct chunk *c,
 		"village-masonry" : "village-rock-bank";
 }
 
+/** These are ordinary traversable ground recipes, not every passable feature.
+ * In particular, water/lava/pits and side-view cave air must not match. */
+bool sdl3_terrain_plain_ground(const char *tile_id)
+{
+	static const char *ids[] = {
+		"open-floor", "meridian-floor", "dirt", "patch-of-grass",
+		"cavewood-floor", "lake-margin", "pine-wood-floor", "marsh-ground",
+		"heath-ground", "meadow-ground", "ruins-floor", "scrub-ground"
+	};
+	if (!tile_id) return false;
+	for (size_t i = 0; i < N_ELEMENTS(ids); i++)
+		if (streq(tile_id, ids[i])) return true;
+	return false;
+}
+
+/** Transparent top-down props need the same quiet ground as nearby cells.
+ * Missing prop artwork must still draw its glyph above this underlay. */
+const char *sdl3_terrain_underlay(const char *tile_id)
+{
+	static const char *props[] = {
+		"door", "open-door", "broken-door", "up-staircase", "down-staircase",
+		"rubble", "passable-rubble", "general-store", "armoury", "weapon-smiths",
+		"bookstore", "alchemy-shop", "magic-shop", "black-market", "home",
+		"fishing-shop"
+	};
+	if (!tile_id) return NULL;
+	if (streq(tile_id, "tree") || streq(tile_id, "pine-tree") || streq(tile_id, "brake"))
+		return "patch-of-grass";
+	for (size_t i = 0; i < N_ELEMENTS(props); i++)
+		if (streq(tile_id, props[i])) return "open-floor";
+	return NULL;
+}
+
 enum sdl3_ascii_terrain sdl3_terrain_ascii_kind(const struct grid_data *data,
 		const char *full_tile_id)
 {

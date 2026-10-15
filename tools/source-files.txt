@@ -148,7 +148,9 @@ game/lib/tiles/full-32.txt
 game/lib/tiles/full-64.txt
 game/lib/tiles/hybrid-32.txt
 game/lib/tiles/hybrid-64.txt
+game/lib/tiles/pickups-index.txt
 game/lib/tiles/pixel-001-index.txt
+game/lib/tiles/scenery-index.txt
 game/lib/tiles/terrain-index.txt
 game/lib/tiles/vegetation-index.txt
 game/lib/tiles/village-index.txt

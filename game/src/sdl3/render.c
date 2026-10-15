@@ -1645,6 +1645,7 @@ static bool draw_map_tile_cell(struct sdl3_visual *visual,
 	bool terrain_drawn = false;
 	bool subject_drawn = false;
 	bool terrain_only;
+	bool keep_ground;
 
 	if (!visual || !renderer || !theme || !map_view || !source_cell || !cell ||
 			!rect || !font) {
@@ -1663,6 +1664,16 @@ static bool draw_map_tile_cell(struct sdl3_visual *visual,
 	SDL_SetRenderDrawColor(renderer, background.r, background.g, background.b,
 		background.a);
 	SDL_RenderFillRect(renderer, rect);
+	keep_ground = visual->tile_mode == SDL3_TILE_MODE_FULL && visual->ascii_floors;
+	if (variant && visual->tile_mode == SDL3_TILE_MODE_FULL && !keep_ground) {
+		const char *underlay = sdl3_terrain_underlay(variant->tile_id);
+		if (underlay && sdl3_tile_make_key(feature_key, sizeof(feature_key),
+				SDL3_TILE_FEATURE, underlay)) {
+			/* Do not count the underlay as a successfully drawn feature. */
+			(void)sdl3_tiles_draw(&visual->tiles, renderer, feature_key,
+				world_col, world_row, rect, brightness);
+		}
+	}
 	if (variant && visual->tile_mode == SDL3_TILE_MODE_FULL &&
 			variant->full_tile_id && sdl3_tile_make_key(feature_key,
 			sizeof(feature_key), SDL3_TILE_FEATURE, variant->full_tile_id)) {
@@ -1670,7 +1681,9 @@ static bool draw_map_tile_cell(struct sdl3_visual *visual,
 			world_col, world_row, rect, brightness);
 	}
 	/* Incomplete media still falls back to the normal feature/glyph. */
-	if (!terrain_drawn && variant && variant->tile_id && sdl3_tile_make_key(feature_key,
+	if (!terrain_drawn && variant && variant->tile_id &&
+			!(keep_ground && sdl3_terrain_plain_ground(variant->tile_id)) &&
+			sdl3_tile_make_key(feature_key,
 			sizeof(feature_key), SDL3_TILE_FEATURE, variant->tile_id)) {
 		terrain_drawn = sdl3_tiles_draw(&visual->tiles, renderer, feature_key,
 			world_col, world_row, rect, brightness);
@@ -2297,10 +2310,12 @@ void sdl3_visual_render(struct sdl3_visual *visual, SDL_Renderer *renderer,
 	int tile_size = frame->tile_mode ? (frame->hybrid_tile_size == 32 ? 32 : 64) : 0;
 	bool ascii_square = frame->ascii_square && !frame->tile_mode;
 	bool ascii_enhanced = ascii_square && frame->ascii_enhanced;
+	bool ascii_floors = frame->tile_mode == SDL3_TILE_MODE_FULL && frame->ascii_floors;
 	if (visual->ascii_square != ascii_square ||
-			visual->ascii_enhanced != ascii_enhanced) {
+			visual->ascii_enhanced != ascii_enhanced || visual->ascii_floors != ascii_floors) {
 		visual->ascii_square = ascii_square;
 		visual->ascii_enhanced = ascii_enhanced;
+		visual->ascii_floors = ascii_floors;
 		sdl3_visual_invalidate_grid_cache(visual);
 	}
 	if (visual->hybrid_tile_size != tile_size || visual->tile_mode != frame->tile_mode) {
@@ -2409,7 +2424,7 @@ void sdl3_visual_render(struct sdl3_visual *visual, SDL_Renderer *renderer,
 		frame->visible_weather ? SDL3_WEATHER_AUTO : SDL3_WEATHER_OFF,
 		frame->fullscreen, frame->dock_visible, frame->hud_stats_visible,
 		frame->big_stat_cards, frame->animated_combat, frame->edge_warnings, frame->tile_mode,
-		frame->hybrid_tile_size, frame->ascii_square, frame->ascii_enhanced,
+		frame->hybrid_tile_size, frame->ascii_square, frame->ascii_enhanced, frame->ascii_floors,
 		frame->dock_placement,
 		frame->dock_rows, frame->dock_cols, frame->audio,
 		frame->game_options, frame->playing);
