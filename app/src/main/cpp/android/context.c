@@ -82,6 +82,8 @@
 #include "world-fishing-site.h"
 #include "world-spelunking.h"
 #include "world-spelunking-adapter.h"
+#include "world-spelunking-door.h"
+#include "world-spelunking-fixture.h"
 #include "world-spelunking-passage.h"
 #include "world-spelunking-runtime.h"
 #include "world-spelunking-system.h"
@@ -253,8 +255,10 @@ enum primary_action {
 	PRIMARY_CAVE_JUMP = 20,
 	PRIMARY_CAVE_GRIP = 21,
 	PRIMARY_CAVE_LEAVE = 22,   /* standing on the way out */
-	PRIMARY_CAVE_WAIT = 23     /* swimming */
-	/* In caves PRIMARY_GET, PRIMARY_UP and PRIMARY_DOWN (passages) apply too. */
+	PRIMARY_CAVE_WAIT = 23,    /* swimming */
+	PRIMARY_CAVE_DISARM = 24   /* a known armed trap (or trapped chest) in reach */
+	/* In caves PRIMARY_GET, PRIMARY_UP and PRIMARY_DOWN (passages),
+	 * PRIMARY_OPEN (a door or a chest) and PRIMARY_FISH apply too. */
 };
 
 enum context_flag {
@@ -333,6 +337,40 @@ static int primary_action(void)
 	return PRIMARY_NONE;
 }
 
+/* A known trap to disarm, or a door or chest to open, that the game's own
+ * Disarm or Open would reach from here: on the player's row, beside them or
+ * under them, as cave_interact (cmd-spelunking.c) looks. Disarm comes first,
+ * since opening a chest known to be trapped springs it. */
+static int cave_fixture_action(const struct world_spelunk_runtime *runtime)
+{
+	const struct world_spelunk_state *state = &runtime->state;
+	bool open = false;
+	int dx;
+
+	if (!world_spelunk_has_stable_floor(state)) return PRIMARY_NONE;
+	for (dx = -1; dx <= 1; dx++) {
+		const struct world_spelunk_door *door =
+			world_spelunk_door_at(runtime, state->x + dx, state->y);
+		const struct world_spelunk_fixture *fixture =
+			world_spelunk_fixture_at(runtime, state->x + dx, state->y);
+		const struct world_spelunk_fixture_definition *def = fixture ?
+			world_spelunk_fixture_by_id(fixture->id) : NULL;
+
+		if (fixture && fixture->known &&
+				fixture->trap_known == SPELUNK_TRAP_ARMED) {
+			return PRIMARY_CAVE_DISARM;
+		}
+		if (fixture && fixture->known && def && def->kind == SPELUNK_CHEST &&
+				fixture->known != SPELUNK_FIXTURE_SPENT) {
+			open = true;
+		}
+		if (door && door->known && door->known != WORLD_SPELUNK_DOOR_OPEN) {
+			open = true;
+		}
+	}
+	return open ? PRIMARY_OPEN : PRIMARY_NONE;
+}
+
 /* What the player can do where they are in a side-view cave. */
 static int cave_primary_action(void)
 {
@@ -370,6 +408,11 @@ static int cave_primary_action(void)
 		if (grid.x == state->x && grid.y == state->y) {
 			return PRIMARY_CAVE_LEAVE;
 		}
+	}
+	{
+		int fixture_action = cave_fixture_action(runtime);
+
+		if (fixture_action != PRIMARY_NONE) return fixture_action;
 	}
 	{
 		/* Beside water the cave can be fished from (its status says so). */

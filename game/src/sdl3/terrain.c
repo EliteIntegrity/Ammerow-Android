@@ -12,6 +12,8 @@
 
 #include "sdl3/terrain.h"
 #include "game-world.h"
+#include "map-visual-data.h"
+#include "trap.h"
 #include "world-entry.h"
 #include "world-overworld.h"
 
@@ -119,7 +121,7 @@ const char *sdl3_terrain_underlay(const char *tile_id)
 		"door", "open-door", "broken-door", "up-staircase", "down-staircase",
 		"rubble", "passable-rubble", "general-store", "armoury", "weapon-smiths",
 		"bookstore", "alchemy-shop", "magic-shop", "black-market", "home",
-		"fishing-shop"
+		"fishing-shop", "relic-broker"
 	};
 	if (!tile_id) return NULL;
 	if (streq(tile_id, "tree") || streq(tile_id, "pine-tree") || streq(tile_id, "brake"))
@@ -127,6 +129,38 @@ const char *sdl3_terrain_underlay(const char *tile_id)
 	for (size_t i = 0; i < N_ELEMENTS(props); i++)
 		if (streq(tile_id, props[i])) return "open-floor";
 	return NULL;
+}
+
+/** Use only the trap already exposed by map_info and its public category name.
+ * In particular, a gas vent must not identify which gas, nor a pit its spikes.
+ * Webs cover objects in the core display; other traps do not. */
+const char *sdl3_terrain_trap_tile(const struct grid_data *data)
+{
+	const struct map_visual_binding *binding;
+	const struct trap *trap;
+	char semantic[128];
+	size_t i;
+	if (!data || data->hallucinate || data->is_player || data->m_idx ||
+			!(trap = data->trap) || !trap->kind || !trap->kind->name ||
+			!(trf_has(trap->flags, TRF_VISIBLE) ||
+			  trf_has(trap->flags, TRF_GLYPH) || trf_has(trap->flags, TRF_WEB)))
+		return NULL;
+	if (!trf_has(trap->flags, TRF_WEB) && (data->first_kind ||
+			data->multiple_objects || data->unseen_object || data->unseen_money))
+		return NULL;
+	if (strlen(trap->kind->name) >= sizeof(semantic)) return NULL;
+	my_strcpy(semantic, trap->kind->name, sizeof(semantic));
+	for (i = 0; semantic[i]; i++) if (semantic[i] == ' ') semantic[i] = '-';
+	binding = map_visual_for("trap", semantic);
+	return binding ? binding->key : NULL;
+}
+
+enum sdl3_tile_glyph_policy sdl3_terrain_glyph_policy(int exposed_feature)
+{
+	/* The sign is art; its number/letter remains the actual game's label. */
+	return exposed_feature > FEAT_NONE && exposed_feature < FEAT_MAX &&
+		tf_has(f_info[exposed_feature].flags, TF_SHOP) ?
+		SDL3_TILE_GLYPH_PRESERVE : SDL3_TILE_GLYPH_AUTO;
 }
 
 enum sdl3_ascii_terrain sdl3_terrain_ascii_kind(const struct grid_data *data,

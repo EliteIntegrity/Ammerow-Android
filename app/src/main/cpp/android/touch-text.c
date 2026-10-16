@@ -188,6 +188,15 @@ static const struct rewrite lines[] = {
 	/* Nearby creatures: the order is a keyboard extra */
 	{ "Up/Down scrolls   PgUp/PgDn pages   X changes order   Escape or [ returns",
 		"D-pad scrolls   PgUp/PgDn pages   Back returns" },
+	/* Nearby creatures and items in a cave */
+	{ "Up/Down scroll   PgUp/PgDn page   Escape returns (no time passes)",
+		"D-pad scrolls   PgUp/PgDn pages   Back returns (no time passes)" },
+	/* The Cave Survey (Char's last tab): OK or a tap on a section explores
+	 * it; Tab and Home are keyboard extras. */
+	{ "Enter explore survey | Left/Right tabs | Esc close",
+		"OK explores the survey | D-pad: tabs | Back closes" },
+	{ "Arrows select | Tab next | Home here | Esc back to tabs",
+		"D-pad or a tap selects | Back returns to the tabs" },
 	/* The message log: Find and Next match are beside the d-pad */
 	{ "Up/Down scrolls   PgUp/PgDn pages   Left/Right slides   = finds text   Escape returns",
 		"D-pad scrolls and slides   PgUp/PgDn pages   Find searches   Back returns" },
@@ -260,6 +269,16 @@ static const struct rewrite phrases[] = {
 	/* The quest log is a page of the character sheet (Char). */
 	{ "Shift+C > Quests", "Char > Quests" },
 	{ "   Ctrl-C: Fish", "   Fish: large button" },
+	/* Looking in a cave: its doors, chests and traps have buttons (the large
+	 * one beside them, and under More), and so has tunnelling (More). */
+	{ "Use D to disarm, o to open.", "Use Disarm, then Open." },
+	{ "Use D to disarm.", "Use Disarm." },
+	{ "Use o to open, c to close.", "Use Open or Close door." },
+	{ "Use o to open it.", "Use Open." },
+	{ "Use o to open.", "Use Open." },
+	{ "Ctrl+T: tunnel (", "Tunnel (More): " },
+	{ "T: tunnel (", "Tunnel (More): " },
+	{ " stamina/attempt).", " stamina an attempt." },
 };
 
 /* android/context.c: an item list is open just to browse it, and the buttons
@@ -400,7 +419,8 @@ static const char *touch_text(const char *text, char *buffer, size_t size)
 			!strstr(text, "Click") && !strstr(text, "Any key") &&
 			!strstr(text, "any key") && !strstr(text, "Shift+") &&
 			!strstr(text, "Y deletes") && !strstr(text, "Up shows") &&
-			!strstr(text, "Ctrl-C")) {
+			!strstr(text, "Ctrl-C") && !strstr(text, "Use o to") &&
+			!strstr(text, "Use D to") && !strstr(text, ": tunnel (")) {
 		return text;
 	}
 	if (strlen(text) >= size) return text;

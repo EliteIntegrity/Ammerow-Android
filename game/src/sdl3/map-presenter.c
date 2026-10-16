@@ -26,6 +26,8 @@
 #include "ui-map.h"
 #include "ui-object.h"
 #include "ui-output.h"
+#include "ui-prefs.h"
+#include "trap.h"
 #include "ui-spelunking.h"
 #include "world-turn.h"
 #include "world-spelunking-breath.h"
@@ -177,6 +179,15 @@ static void configure_map_features_and_items(struct sdl3_map_view *view)
 			if (data.hallucinate || data.is_player) continue;
 			grid_data_as_text(&data, &attr, &glyph, &terrain_attr,
 				&terrain_glyph);
+			if (view->tile_mode) {
+				const char *trap_key = sdl3_terrain_trap_tile(&data);
+				if (trap_key && glyph == trap_x_char[data.lighting][data.trap->kind->tidx] &&
+						attr == trap_x_attr[data.lighting][data.trap->kind->tidx]) {
+					add_map_art_subject(view, col, row, glyph, attr,
+						SDL3_MAP_ART_TERRAIN, NULL, trap_key, NULL);
+					continue;
+				}
+			}
 			if (data.first_kind && !data.multiple_objects &&
 					!data.unseen_object && !data.unseen_money &&
 					glyph == object_kind_char(data.first_kind) &&
@@ -410,6 +421,7 @@ static bool populate_expanded_map(struct sdl3_map_presenter *presenter,
 						player->cave, loc(first_col + col, first_row + row), data.f_idx);
 					variant.ascii_terrain = sdl3_terrain_ascii_kind(&data,
 						variant.full_tile_id);
+					variant.tile_glyph_policy = sdl3_terrain_glyph_policy(data.f_idx);
 					variant.present = true;
 					replacement = &variant;
 				}
@@ -533,6 +545,7 @@ static void configure_terrain_overlay(struct sdl3_map_presenter *presenter,
 					player->cave, loc(dungeon_col, dungeon_row), data.f_idx);
 				variant.ascii_terrain = sdl3_terrain_ascii_kind(&data,
 					variant.full_tile_id);
+				variant.tile_glyph_policy = sdl3_terrain_glyph_policy(data.f_idx);
 				variant.present = true;
 				replacement = &variant;
 			}

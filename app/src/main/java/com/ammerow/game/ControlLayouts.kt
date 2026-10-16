@@ -45,11 +45,14 @@ object Primary {
     const val SHOP = 5
     const val FISH = 6
     const val OPEN = 7
-    // Side-view caves (GET, UP and DOWN apply there too: items and passages).
+    // Side-view caves (GET, UP and DOWN apply there too: items and passages;
+    // OPEN for a door or a chest; FISH).
     const val CAVE_JUMP = 20
     const val CAVE_GRIP = 21
     const val CAVE_LEAVE = 22
     const val CAVE_WAIT = 23
+    /** A known armed trap, or a chest known to be trapped, in reach. */
+    const val CAVE_DISARM = 24
 }
 
 /** A shop's list, as bits of [GameContext.detail] (keep in step with android/context.c). */
@@ -569,15 +572,19 @@ object ControlLayouts {
                 Primary.CAVE_LEAVE -> cmd("Leave", '<')
                 Primary.CAVE_GRIP -> grip
                 Primary.CAVE_WAIT -> wait
+                // Beside a known trap, door or chest (or on a trap or chest): the
+                // game picks the one in reach, or asks which with the d-pad.
+                Primary.CAVE_DISARM -> cmd("Disarm", 'D')
+                Primary.OPEN -> cmd("Open", 'o')
                 // Standing beside water the cave can be fished from.
                 Primary.FISH -> fish
                 else -> jump
             }
             // Grip is the big button while climbing or falling; then a piton is the useful extra.
-            // Fishing from the bank, Jump keeps its place beside it (Grip does nothing standing).
-            val first = when (primary) {
-                grip -> piton
-                fish -> jump
+            // Fishing from the bank or beside a fixture, Jump keeps its place beside it.
+            val first = when (context.primary) {
+                Primary.CAVE_GRIP -> piton
+                Primary.FISH, Primary.OPEN, Primary.CAVE_DISARM -> jump
                 else -> grip
             }
             Cluster(primary, listOf(first, rope, peek))
@@ -688,6 +695,8 @@ object ControlLayouts {
         ),
         "Caves" to listOf(
             cmd("Jump", 'j'), grip, piton, rope, cmd("Get", 'g'), cmd("Drop", 'd'),
+            // Doors and supply chests open alike; traps and chest traps disarm.
+            cmd("Open", 'o'), cmd("Close door", 'c'), cmd("Disarm", 'D'), cmd("Tunnel", 'T'), rest,
             cmd("Passage up", '<'), cmd("Passage down", '>'), wait,
         ),
         "Game" to listOf(

@@ -18,6 +18,7 @@
 #include "ui-help.h"
 #include "ui-input.h"
 #include "ui-mode-input.h"
+#include "ui-spelunking-survey.h"
 #include "sdl3/audio.h"
 #include "sdl3/credits.h"
 #include "sdl3/fishing.h"
@@ -228,6 +229,28 @@ static bool handle_semantic_selection_pointer(struct sdl3_app *app,
 	int delta;
 
 	bool list_screen;
+
+	if (app && event && app->screen.active &&
+			app->screen.kind == UI_SCREEN_CAVE_SURVEY) {
+		/* Selection is a semantic index, not a click on the hidden terminal
+		 * map. Hover and blank clicks must not navigate or change focus. */
+		if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+			if (event->button.button == SDL_BUTTON_RIGHT) {
+				Term_keypress(ESCAPE, 0);
+			} else if (activate && pointer_event_cell(app, event, &col, &screen_row)) {
+				if (sdl3_screen_map_node_at(&app->screen, app->grid.cols,
+						app->grid.rows, col, screen_row, &index)) {
+					Term_keypress(KC_SURVEY_SELECT_FIRST + index, 0);
+				} else if (sdl3_screen_tab_at(&app->screen, app->grid.cols,
+						app->grid.rows, col, screen_row, &index)) {
+					/* Survey is the last tab; step backward to the clicked tab. */
+					for (int i = app->screen.tab_count - 1; i > index; i--)
+						Term_keypress(ARROW_LEFT, 0);
+				}
+			}
+		}
+		return true;
+	}
 
 	if (!app || !event || !app->screen.active) return false;
 	/* Shops and item lists draw their rows from semantic models too, at

@@ -94,7 +94,10 @@ shops, stairs and exits to you.  Hidden dangers can still surprise you.
 It does not explore side-view caves.  Starting again counts the loot you
 already know of as seen; passing over it, your pick-up settings apply.
 When it stops, a message says why, with the steps taken and the gold
-collected.
+collected.  A creature it stops for may be sensed by detection or
+telepathy beyond normal sight or the screen: Monsters (under More) lists
+it.  An interruption with no clear cause says "interrupted" rather than
+guessing, and exploring never reveals hidden foes.
 
 Walk to stairs, on for new characters: away from stairs, Up and Down
 (under More) walk to the nearest known staircase of that kind; press

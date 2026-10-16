@@ -413,6 +413,9 @@ static bool parse_field(struct headless_scenario *scenario,
 	if (streq(key, "start-anchor")) {
 		if (!streq(value, "fishing-stance") && !streq(value, "open-floor") &&
 				!streq(value, "first-rope-anchor") &&
+				!streq(value, "cave-door") &&
+				!streq(value, "cave-tunnel") &&
+				!streq(value, "cave-chest") && !streq(value, "cave-trap") &&
 				!streq(value, "downward-peek-right")) {
 			return set_error(error, error_size, line,
 				"invalid start anchor", value);

@@ -58,9 +58,14 @@ set(AMMEROW_CORE_SOURCES
     src/world-overworld.c
     src/world-spelunking.c
     src/world-spelunking-adapter.c
+    src/world-spelunking-door.c
+    src/world-spelunking-fixture.c
+    src/world-spelunking-terrain.c
+    src/world-spelunking-rest.c
     src/world-spelunking-actor-data.c
     src/world-spelunking-breath.c
     src/world-spelunking-combat.c
+    src/world-spelunking-actor-effects.c
     src/world-spelunking-codec.c
     src/world-spelunking-data-util.c
     src/world-spelunking-effects.c
@@ -216,6 +221,7 @@ set(AMMEROW_CORE_SOURCES
     src/ui-spoil.c
     src/ui-spelunking-appearance.c
     src/ui-spelunking.c
+    src/ui-spelunking-list.c
     src/ui-spelunking-input.c
     src/ui-spelunking-survey.c
     src/ui-store.c

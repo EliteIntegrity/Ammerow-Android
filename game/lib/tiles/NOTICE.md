@@ -1,7 +1,7 @@
 # Ammerow tile atlases
 
 `pixel-*.png`, `pickups-*.png`, `terrain-*.png`, `vegetation-*.png`,
-`village-*.png` and `scenery-*.png`
+`village-*.png`, `scenery-*.png`, `markers-*.png`, `expedition-*.png` and `caves-*.png`
 are generated pages of separately licensed Ammerow visual assets.
 They are not covered by the GPL that applies to the program.
 
@@ -50,6 +50,13 @@ supplies quiet ground, water, lava, doors, stairs, rubble and pits. Ordinary
 ground can instead retain coloured glyphs on black with Keep floors ASCII;
 side-view cave air stays black in either case. These scenery additions do not
 replace the Hybrid terrain presentation.
+
+The marker and expedition supplements add discovered traps, blank shop signs,
+fish, rope, breathing equipment, fishing rods and loot piles. Side-view cave
+art adds rock materials, water, formations, seams, rope, anchors, passages and
+the cave actor. These were also sampled from human-directed OpenAI-generated
+source artwork. Shop numbers/letters and cave passage glyphs remain readable
+overlays. Hidden traps are not revealed or identified by these pictures.
 
 Full Tile scenery has the same separate asset terms above. Source images and
 PNG sheets are excluded from the program source release; text mappings remain

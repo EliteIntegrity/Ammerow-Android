@@ -70,6 +70,8 @@ const char *sdl3_terrain_full_tile_for_grid(struct chunk *c,
 		struct chunk *known, struct loc grid, int exposed_feature);
 bool sdl3_terrain_plain_ground(const char *tile_id);
 const char *sdl3_terrain_underlay(const char *tile_id);
+const char *sdl3_terrain_trap_tile(const struct grid_data *data);
+enum sdl3_tile_glyph_policy sdl3_terrain_glyph_policy(int exposed_feature);
 enum sdl3_ascii_terrain sdl3_terrain_ascii_kind(const struct grid_data *data,
 		const char *full_tile_id);
 const char *sdl3_terrain_style_name(enum sdl3_terrain_style style);

@@ -548,7 +548,53 @@ static int test_square_source_extent(void *state)
 	ok;
 }
 
+static int test_trap_tiles_and_shop_labels(void *state)
+{
+	struct trap_kind kind = { .name = "gas trap" };
+	struct trap trap = { .kind = &kind };
+	struct grid_data data = { .f_idx = FEAT_FLOOR, .trap = &trap };
+	struct object_kind object = { 0 };
+	(void)state;
+	null(sdl3_terrain_trap_tile(&data));
+	trf_on(trap.flags, TRF_VISIBLE);
+	require(streq(sdl3_terrain_trap_tile(&data), "feature:gas-trap"));
+	kind.desc = "sleep gas";
+	require(streq(sdl3_terrain_trap_tile(&data), "feature:gas-trap"));
+	data.hallucinate = true;
+	null(sdl3_terrain_trap_tile(&data));
+	data.hallucinate = false; data.is_player = true;
+	null(sdl3_terrain_trap_tile(&data));
+	data.is_player = false; data.m_idx = 1;
+	null(sdl3_terrain_trap_tile(&data));
+	data.m_idx = 0; data.first_kind = &object;
+	null(sdl3_terrain_trap_tile(&data));
+	data.first_kind = NULL; data.unseen_object = true;
+	null(sdl3_terrain_trap_tile(&data));
+	data.unseen_object = false; data.multiple_objects = true;
+	null(sdl3_terrain_trap_tile(&data));
+	kind.name = "web"; trf_on(trap.flags, TRF_WEB);
+	require(streq(sdl3_terrain_trap_tile(&data), "feature:web"));
+	data.multiple_objects = false;
+	/* All existing public trap categories have bindings; door locks do not. */
+	for (int i = 1; i < z_info->trap_max; i++) {
+		trap.kind = &trap_info[i];
+		trf_wipe(trap.flags);
+		trf_on(trap.flags, TRF_VISIBLE);
+		if (streq(trap.kind->name, "door lock")) {
+			null(sdl3_terrain_trap_tile(&data));
+		} else {
+			notnull(sdl3_terrain_trap_tile(&data));
+		}
+	}
+	for (int i = FEAT_NONE; i < FEAT_MAX; i++) {
+		eq(sdl3_terrain_glyph_policy(i), tf_has(f_info[i].flags, TF_SHOP) ?
+			SDL3_TILE_GLYPH_PRESERVE : SDL3_TILE_GLYPH_AUTO);
+	}
+	ok;
+}
+
 struct test tests[] = {
+	{ "known trap categories, foreground precedence and shop labels", test_trap_tiles_and_shop_labels },
 	{ "ASCII wall styling excludes subjects, floors and markers", test_ascii_wall_semantics },
 	{ "square source extent and Hybrid independence", test_square_source_extent },
 	{ "Full Tile village materials and known four-way gates", test_full_tile_village_materials_and_gates },

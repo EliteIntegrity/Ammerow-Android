@@ -74,6 +74,12 @@ static void tile_subjects(const struct world_spelunk_view *snapshot,
 				sdl3_tile_make_key(subject.tile_fallback_key,
 					sizeof(subject.tile_fallback_key), SDL3_TILE_OBJECT,
 					object->fallback_id);
+			} else if (cell == WORLD_SPELUNK_VIEW_CHEST ||
+					cell == WORLD_SPELUNK_VIEW_REMEMBERED_CHEST) {
+				subject.glyph = L'~';
+				subject.attr = COLOUR_L_UMBER;
+				subject.priority = SDL3_MAP_ART_ITEM;
+				sdl3_tile_make_key(subject.tile_key, sizeof(subject.tile_key), SDL3_TILE_OBJECT, "chest");
 			} else {
 				continue;
 			}
@@ -89,6 +95,14 @@ static void base_terrain_appearance(const struct world_spelunk_view *snapshot,
 		int col, int row, int *attr, wchar_t *glyph)
 {
 	switch (world_spelunk_view_cell_at(snapshot, col, row)) {
+	case WORLD_SPELUNK_VIEW_REMEMBERED_TRAP:
+		*attr = COLOUR_ORANGE; *glyph = L'^'; break;
+	case WORLD_SPELUNK_VIEW_REMEMBERED_CHEST:
+		*attr = COLOUR_L_UMBER; *glyph = L'~'; break;
+	case WORLD_SPELUNK_VIEW_REMEMBERED_DOOR_CLOSED:
+		*attr = COLOUR_L_UMBER; *glyph = L'+'; break;
+	case WORLD_SPELUNK_VIEW_REMEMBERED_DOOR_OPEN:
+		*attr = COLOUR_L_UMBER; *glyph = L'\''; break;
 	case WORLD_SPELUNK_VIEW_REMEMBERED_AIR:
 		*attr = snapshot->visible_air_attr;
 		*glyph = snapshot->visible_air_glyph;
