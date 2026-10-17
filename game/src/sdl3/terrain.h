@@ -49,6 +49,8 @@ struct sdl3_terrain_variant {
 	enum sdl3_tile_glyph_policy tile_glyph_policy;
 	/** Only unobscured, knowledge-safe terrain may receive ASCII styling. */
 	enum sdl3_ascii_terrain ascii_terrain;
+	/** Known automatic-travel threshold; NONE everywhere else. */
+	enum grid_surface_type crossing;
 	/** Zero uses the theme default; otherwise 0..255 remembered brightness. */
 	uint8_t remembered_brightness;
 	bool in_view;
@@ -72,6 +74,7 @@ bool sdl3_terrain_plain_ground(const char *tile_id);
 const char *sdl3_terrain_underlay(const char *tile_id);
 const char *sdl3_terrain_trap_tile(const struct grid_data *data);
 enum sdl3_tile_glyph_policy sdl3_terrain_glyph_policy(int exposed_feature);
+enum grid_surface_type sdl3_terrain_crossing(const struct grid_data *data);
 enum sdl3_ascii_terrain sdl3_terrain_ascii_kind(const struct grid_data *data,
 		const char *full_tile_id);
 const char *sdl3_terrain_style_name(enum sdl3_terrain_style style);

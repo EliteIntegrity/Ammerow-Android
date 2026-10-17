@@ -423,6 +423,7 @@ static int test_full_tile_village_materials_and_gates(void *state)
 	require(world_overworld_layout_set(player, WORLD_OVERWORLD_VERSION, 3, 3, 9, 0));
 	require(world_overworld_rebuild_routes(player));
 	require(world_chunk_set_location(actual, "core.hub", false));
+	require(world_chunk_set_location(known, "core.hub", false));
 	square_set_feat(actual, shop, FEAT_PERM);
 	square_set_feat(actual, bank, FEAT_GRANITE);
 	require(streq(sdl3_terrain_full_tile_for_grid(actual, known, shop, FEAT_PERM),
@@ -444,6 +445,8 @@ static int test_full_tile_village_materials_and_gates(void *state)
 			square_set_feat(actual, edge, FEAT_PERM);
 			square_set_feat(actual, gate, FEAT_FLOOR);
 			/* Actual knowledge alone must not create a visible exit. */
+			require(!streq(square_apparent_name(known, gate),
+				"region crossing (step here to travel)"));
 			require(streq(sdl3_terrain_full_tile_for_grid(actual, known, edge, FEAT_PERM),
 				"village-rock-bank"));
 			struct grid_data data = { .f_idx = FEAT_PERM };
@@ -451,6 +454,14 @@ static int test_full_tile_village_materials_and_gates(void *state)
 				sdl3_terrain_full_tile_for_grid(actual, known, edge, FEAT_PERM)),
 				SDL3_ASCII_TERRAIN_WALL);
 			square_set_feat(known, gate, FEAT_FLOOR);
+			eq(world_entry_is_edge_exit_grid(actual, gate), ABS(delta) <= 2);
+			require(!world_entry_is_edge_exit_grid(actual, edge));
+			eq(streq(square_apparent_name(known, gate),
+				"region crossing (step here to travel)"), ABS(delta) <= 2);
+			if (ABS(delta) <= 2) {
+				require(streq(square_apparent_look_prefix(known, gate), "a "));
+				require(streq(square_apparent_look_in_preposition(known, gate), "at "));
+			}
 			require(streq(sdl3_terrain_full_tile_for_grid(actual, known, edge, FEAT_PERM),
 				ABS(delta) <= 2 ? "travel-opening" : "village-rock-bank"));
 			eq(sdl3_terrain_ascii_kind(&data,
@@ -460,6 +471,17 @@ static int test_full_tile_village_materials_and_gates(void *state)
 			eq(square(actual, gate)->feat, FEAT_FLOOR);
 		}
 	}
+	/* The fast rejection cannot discard a trigger or mark safe arrival cells. */
+	for (int y = 0; y < actual->height; y++) {
+		for (int x = 0; x < actual->width; x++) {
+			bool expected = ((y == 1 || y == actual->height - 2) && ABS(x - 99) <= 2) ||
+				((x == 1 || x == actual->width - 2) && ABS(y - 33) <= 2);
+			eq(world_entry_is_edge_exit_grid(actual, loc(x, y)), expected);
+		}
+	}
+	require(!world_entry_is_edge_exit_grid(actual, loc(-1, 1)));
+	require(!world_entry_is_edge_exit_grid(actual, loc(99, actual->height)));
+	require(!world_entry_is_edge_exit_grid(NULL, loc(99, 1)));
 	/* The victory profile changes colours, not the village material identity. */
 	player->total_winner = true;
 	require(streq(sdl3_terrain_full_tile_for_grid(actual, known, shop, FEAT_PERM),

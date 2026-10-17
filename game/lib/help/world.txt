@@ -1,9 +1,10 @@
 The Known World and Travel
 ==========================
 
-Ammerow's launch basin is a deliberately compact three-by-three surface.  The
-village, roads, woods, lake and cave approaches are real local maps joined at
-their edges.  Green arrows mark a physical route out of the current region.
+Ammerow's launch basin is a deliberately compact three-by-three surface.
+The village, roads, woods, lake and cave approaches are real local maps
+joined at their edges.  Amber arrows on a hatched edge mark a physical
+route out of the current region (Look calls one a region crossing).
 Stepping onto a travel arrow crosses to its connected region and teaches
 that direction of the route, whichever way you approached it.
 

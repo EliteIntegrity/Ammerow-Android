@@ -163,6 +163,15 @@ enum sdl3_tile_glyph_policy sdl3_terrain_glyph_policy(int exposed_feature)
 		SDL3_TILE_GLYPH_PRESERVE : SDL3_TILE_GLYPH_AUTO;
 }
 
+enum grid_surface_type sdl3_terrain_crossing(const struct grid_data *data)
+{
+	/* This is an underlay: an actor/item must not erase a known threshold.
+	 * Use exposed map metadata, never infer a route from its glyph. */
+	return data && data->f_idx > FEAT_NONE && data->f_idx < FEAT_MAX &&
+		!data->hallucinate && data->surface >= GRID_SURFACE_EXIT_NORTH &&
+		data->surface <= GRID_SURFACE_EXIT_WEST ? data->surface : GRID_SURFACE_NONE;
+}
+
 enum sdl3_ascii_terrain sdl3_terrain_ascii_kind(const struct grid_data *data,
 		const char *full_tile_id)
 {
@@ -314,6 +323,7 @@ bool sdl3_terrain_overlay_set(struct sdl3_terrain_overlay *overlay, int col,
 			cell->tile_overlay_key == variant->tile_overlay_key &&
 			cell->tile_glyph_policy == variant->tile_glyph_policy &&
 			cell->ascii_terrain == variant->ascii_terrain &&
+			cell->crossing == variant->crossing &&
 			cell->remembered_brightness == variant->remembered_brightness &&
 			cell->in_view == variant->in_view &&
 			cell->present == variant->present &&

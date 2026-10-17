@@ -126,6 +126,12 @@ static int test_overlay_stores_recipe_metadata(void *unused)
 	require(sdl3_terrain_overlay_set(&overlay, 17, 9, &variant));
 	eq(sdl3_terrain_overlay_get(&overlay, 17, 9)->ascii_terrain,
 		SDL3_ASCII_TERRAIN_WALL);
+	variant.crossing = GRID_SURFACE_EXIT_EAST;
+	require(sdl3_terrain_overlay_set(&overlay, 17, 9, &variant));
+	eq(sdl3_terrain_overlay_get(&overlay, 17, 9)->crossing, GRID_SURFACE_EXIT_EAST);
+	require(!sdl3_terrain_overlay_set(&overlay, 17, 9, &variant));
+	variant.crossing = GRID_SURFACE_NONE;
+	require(sdl3_terrain_overlay_set(&overlay, 17, 9, &variant));
 	variant.full_tile_id = "village-masonry";
 	require(sdl3_terrain_overlay_set(&overlay, 17, 9, &variant));
 	ptreq(sdl3_terrain_overlay_get(&overlay, 17, 9)->full_tile_id,
@@ -170,8 +176,31 @@ static int test_ground_and_underlay(void *unused)
 	ok;
 }
 
+static int test_crossing_metadata(void *unused)
+{
+	struct grid_data data = { .f_idx = FEAT_FLOOR };
+	(void)unused;
+	for (int surface = GRID_SURFACE_NONE; surface <= GRID_SURFACE_EXIT_WEST; surface++) {
+		data.surface = surface;
+		eq(sdl3_terrain_crossing(&data), surface >= GRID_SURFACE_EXIT_NORTH ?
+			surface : GRID_SURFACE_NONE);
+	}
+	/* A known crossing remains underneath a subject; no unknown information. */
+	data.is_player = true;
+	eq(sdl3_terrain_crossing(&data), GRID_SURFACE_EXIT_WEST);
+	data.is_player = false; data.m_idx = 1;
+	eq(sdl3_terrain_crossing(&data), GRID_SURFACE_EXIT_WEST);
+	data.hallucinate = true;
+	eq(sdl3_terrain_crossing(&data), GRID_SURFACE_NONE);
+	data.hallucinate = false; data.f_idx = FEAT_NONE;
+	eq(sdl3_terrain_crossing(&data), GRID_SURFACE_NONE);
+	eq(sdl3_terrain_crossing(NULL), GRID_SURFACE_NONE);
+	ok;
+}
+
 const char *suite_name = "sdl3/terrain";
 struct test tests[] = {
+	{ "known crossing metadata and subjects", test_crossing_metadata },
 	{ "ground excludes hazards and cave air", test_ground_and_underlay },
 	{ "level key stability", test_level_key_is_stable_and_sensitive },
 	{ "natural style", test_natural_resolves_material },

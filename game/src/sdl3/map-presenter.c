@@ -421,7 +421,9 @@ static bool populate_expanded_map(struct sdl3_map_presenter *presenter,
 						player->cave, loc(first_col + col, first_row + row), data.f_idx);
 					variant.ascii_terrain = sdl3_terrain_ascii_kind(&data,
 						variant.full_tile_id);
-					variant.tile_glyph_policy = sdl3_terrain_glyph_policy(data.f_idx);
+					variant.crossing = sdl3_terrain_crossing(&data);
+					variant.tile_glyph_policy = variant.crossing ? SDL3_TILE_GLYPH_PRESERVE :
+						sdl3_terrain_glyph_policy(data.f_idx);
 					variant.present = true;
 					replacement = &variant;
 				}
@@ -545,7 +547,9 @@ static void configure_terrain_overlay(struct sdl3_map_presenter *presenter,
 					player->cave, loc(dungeon_col, dungeon_row), data.f_idx);
 				variant.ascii_terrain = sdl3_terrain_ascii_kind(&data,
 					variant.full_tile_id);
-				variant.tile_glyph_policy = sdl3_terrain_glyph_policy(data.f_idx);
+				variant.crossing = sdl3_terrain_crossing(&data);
+				variant.tile_glyph_policy = variant.crossing ? SDL3_TILE_GLYPH_PRESERVE :
+					sdl3_terrain_glyph_policy(data.f_idx);
 				variant.present = true;
 				replacement = &variant;
 			}

@@ -378,6 +378,10 @@ static void configure_weather(struct sdl3_app *app)
 			SDL_GetTicks() + SDL3_WEATHER_TICK_MS : 0;
 		sdl3_grid_mark_dirty(&app->grid);
 	}
+	/* Held movement can keep input queued. Fold a due weather tick into the
+	 * ordinary frame instead of forcing an extra present ahead of that input. */
+	if (sdl3_weather_tick(&app->weather, SDL_GetTicks(),
+			&app->weather_next_tick_ms)) sdl3_grid_mark_dirty(&app->grid);
 }
 
 void sdl3_frontend_render(struct sdl3_app *app)
