@@ -53,6 +53,8 @@ list(TRANSFORM SDL3_SOURCES PREPEND "${GAME}/")
 
 file(STRINGS "${GAME}/version" AMMEROW_VERSION LIMIT_COUNT 1)
 string(STRIP "${AMMEROW_VERSION}" AMMEROW_VERSION)
+# It is compiled in as BUILD_ID, so a new version must configure again.
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${GAME}/version")
 
 # On Unix the game would keep settings and pref files in ~/.ammerow, using the
 # passwd home directory, which on Android is the unwritable /data. Keep them in
