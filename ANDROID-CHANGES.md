@@ -1,9 +1,8 @@
 # Android changes to the game
 
 `game/` is the game's own source, as published for the desktop edition
-(version 0.1.2, with the changes made since for its next update), with the
-changes below made for Android in 2026 by John Horton. Everything else in
-`game/` is unchanged.
+(version 0.1.3), with the changes below made for Android in 2026 by John
+Horton. Everything else in `game/` is unchanged.
 
 | Change | Files in `game/` |
 | --- | --- |
