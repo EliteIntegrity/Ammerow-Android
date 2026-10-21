@@ -219,7 +219,7 @@ val stageGameAssets = tasks.register<StageGameAssets>("stageGameAssets") {
 tasks.matching { it.name == "preReleaseBuild" }.configureEach {
     doFirst {
         if (assetPack != null && releaseSource == null) {
-            throw GradleException("An official release needs -Pammerow.sourceArchive=... (see README.md)")
+            throw GradleException("An official release needs -Pammerow.sourceArchive=... (see DEVELOPING.md)")
         }
     }
 }

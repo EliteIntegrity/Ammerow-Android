@@ -57,7 +57,7 @@ SECRET_NAMES = {"keystore.properties", "local.properties"}
 # Text written for the Android edition (the game's own files under game/ are
 # the desktop edition's published source) must not point at a private
 # checkout, machine or tool, or carry personal contact details.
-ANDROID_TEXT = ("README.md", "NOTICE.md", "THIRD_PARTY_NOTICES.md", "CONTRIBUTING.md", "ANDROID-CHANGES.md",
+ANDROID_TEXT = ("README.md", "DEVELOPING.md", "NOTICE.md", "THIRD_PARTY_NOTICES.md", "CONTRIBUTING.md", "ANDROID-CHANGES.md",
                 "docs/copying.rst", ".gitignore", ".gitattributes", "app/", "tools/", "game/README.md",
                 "game/sources.cmake", LEGAL)
 PRIVATE_PATTERNS = (

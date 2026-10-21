@@ -17,6 +17,6 @@ reuse merely because the program is open source.
 
 Keep changes focused, data driven and proportionately tested. Preserve the
 ordinary-glyph and synthesised-effect fallbacks. Follow the build and test
-instructions in [README.md](README.md) and
+instructions in [DEVELOPING.md](DEVELOPING.md) and
 [data authoring](game/docs/data-authoring.md). Commit editable authorities
 and generated outputs together.

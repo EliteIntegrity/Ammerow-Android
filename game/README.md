@@ -7,7 +7,7 @@ Android changes listed in [ANDROID-CHANGES.md](../ANDROID-CHANGES.md).
 
 - The Android app compiles the sources listed in `sources.cmake`.
 - `CMakeLists.txt` is the desktop build. Here it is used to run the game's
-  tests (see the repository [README](../README.md)).
+  tests (see [DEVELOPING.md](../DEVELOPING.md)).
 - Generated data files are written by the scripts in `utils/` from their
   inputs; see [docs/data-authoring.md](docs/data-authoring.md).
 - Paths in these files are relative to this folder, except the licence texts
