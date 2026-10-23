@@ -463,7 +463,9 @@ static bool prompt_context(int *mode, int *detail)
 		/* An item's details or actions, as a panel over whatever opened them
 		 * (an item list, a shop, looking at the floor): OK, Back and paging. */
 		*mode = MODE_PROMPT;
-	} else if (msg_flag && more_prompt_showing()) {
+	} else if (more_prompt_showing()) {
+		/* (Not msg_flag: a long message's first part waits at -more- before
+		 * the game sets it.) */
 		*mode = MODE_MORE;
 	} else if (name_depth > 0) {
 		*mode = MODE_TEXT;

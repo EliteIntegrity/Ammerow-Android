@@ -1061,6 +1061,8 @@ game/tests/headless/scenarios/level-rewards-large.scn
 game/tests/headless/scenarios/level-rewards.scn
 game/tests/headless/scenarios/settings-large.scn
 game/tests/headless/scenarios/smoke.scn
+game/tests/headless/scenarios/village-request-log.scn
+game/tests/headless/scenarios/village-request-receipt.scn
 game/tests/run-test
 game/tests/trivial/matcher/input
 game/tests/trivial/matcher/matcher

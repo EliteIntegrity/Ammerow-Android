@@ -276,6 +276,10 @@ static const struct rewrite phrases[] = {
 	{ "Use o to open, c to close.", "Use Open or Close door." },
 	{ "Use o to open it.", "Use Open." },
 	{ "Use o to open.", "Use Open." },
+	/* A cave discovery: the large button opens it; once empty, Open under
+	 * More rereads its note. */
+	{ "Use o to search it.", "Use Open to search it." },
+	{ "Use o to reread its note.", "Open (More) rereads its note." },
 	{ "Ctrl+T: tunnel (", "Tunnel (More): " },
 	{ "T: tunnel (", "Tunnel (More): " },
 	{ " stamina/attempt).", " stamina an attempt." },
@@ -329,6 +333,12 @@ static const struct rewrite block_phrases[] = {
 		"Type... replaces the suggested name; OK keeps it." },
 	/* The Fishing Shop's quest briefing */
 	{ "Press Shift+C > Quests at any time", "Tap Char, then Quests, at any time" },
+	{ "Donate with Shift+D;", "Use its Donate button;" },
+	/* The village fish requests (lib/gamedata/objective.txt), on Char >
+	 * Quests, and the General Store's greeting (store.txt) */
+	{ "Use Shift+D at the General Store.", "Donate it at the General Store." },
+	{ " with Shift+D.", "." },
+	{ "; Shift+D donates.", "; tap Donate to give a catch." },
 	/* The First Sounding (lib/gamedata/story.txt) and donation receipts */
 	{ "Shift+C > Quests", "Char > Quests" },
 };
@@ -481,6 +491,14 @@ void __wrap_sdl3_monster_card_configure(struct sdl3_inspect_card *card,
 	}
 }
 
+/* Looking in a cave, a long description is one line cut at the screen's
+ * edge (ui-spelunking.c), so the reworded line can be cut there too. */
+static bool cave_look_cut(int x, int n, const char *s)
+{
+	return Term && x + n >= Term->wid && (strstr(s, "Use o to") ||
+		strstr(s, "Use D to") || strstr(s, ": tunnel ("));
+}
+
 errr __real_Term_putstr(int x, int y, int n, int a, const char *s);
 errr __wrap_Term_putstr(int x, int y, int n, int a, const char *s)
 {
@@ -488,7 +506,11 @@ errr __wrap_Term_putstr(int x, int y, int n, int a, const char *s)
 	const char *text;
 
 	/* A counted fragment is part of something longer; leave it as it is. */
-	if (n >= 0 && s && (size_t)n < strlen(s)) return __real_Term_putstr(x, y, n, a, s);
+	if (n >= 0 && s && (size_t)n < strlen(s)) {
+		if (!cave_look_cut(x, n, s)) return __real_Term_putstr(x, y, n, a, s);
+		text = touch_text(s, buffer, sizeof(buffer));
+		return __real_Term_putstr(x, y, MIN(n, (int)strlen(text)), a, text);
+	}
 	text = touch_text(s, buffer, sizeof(buffer));
 	return __real_Term_putstr(x, y, text == s ? n : -1, a, text);
 }

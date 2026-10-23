@@ -12,8 +12,8 @@ Tap a section to open it:
     (b) Map symbols
     (c) Interface, settings and saving
     (d) The known world and travel
-    (e) Fishing
-    (f) Side-view caves
+    (e) Fishing and village requests
+    (f) Side-view caves and discoveries
     (g) Keyboard commands
 
 

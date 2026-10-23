@@ -152,7 +152,7 @@ struct expected_store_owner {
 
 static const struct expected_store_identity expected_store_identities[] = {
 	{ FEAT_STORE_GENERAL, 4,
-		"Supplies from the Nine Near Lands, weighed fairly and kept dry." },
+		"Supplies kept dry. One-time fish requests pay gold: see Shift+C > Quests; Shift+D donates." },
 	{ FEAT_STORE_ARMOR, 4,
 		"Repairs cost less than funerals. Try every strap before you trust it." },
 	{ FEAT_STORE_WEAPON, 4,
@@ -365,7 +365,7 @@ static int test_newgame(void *state) {
 	eq(store_kind_quantity(fishing_store, piton_kind), 24);
 	eq(store_kind_quantity(fishing_store, rope_kind), 200);
 	eq(store_kind_quantity(fishing_store, scuba_kind), 2);
-	eq(world_objective_count(), 3);
+	eq(world_objective_count(), 6);
 	longline_objective = world_objective_by_id("lost-longline");
 	reserve_objective = world_objective_by_id("emergency-reserve");
 	underflow_objective = world_objective_by_id("underflow-sounding");
